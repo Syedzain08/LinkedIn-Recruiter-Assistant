@@ -21,7 +21,7 @@ pyautogui.PAUSE = 0.4
 number_of_tabs = 80
 starting_delay = 5
 template_name = "Vacant Position-Data Infrastructure Engineer, Software Engineer IV (4985)"
-rab_close = False
+tab_close = False
 
 # User Screenshots
 email_scs = "./Screenshots/email.png"

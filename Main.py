@@ -2,12 +2,16 @@ import pyautogui
 import time
 import os
 import Private_keys
+import threading
+import pygame
 from twilio.rest import Client
-from playsound import playsound
 from datetime import datetime
 from tkinter import *
+from customtkinter import *
 
+# System Variables
 pyautogui.FAILSAFE = True  # NEVER TURN THIS OFF!
+error_msg_show = False
 
 # Constant time delay
 pyautogui.PAUSE = 0.4
@@ -15,10 +19,11 @@ pyautogui.PAUSE = 0.4
 # User Variables
 
 number_of_tabs = 80
-Starting_delay = 5
+starting_delay = 5
 template_name = "Vacant Position-Data Infrastructure Engineer, Software Engineer IV (4985)"
+rab_close = False
 
-# Base Screenshots
+# User Screenshots
 email_scs = "./Screenshots/email.png"
 email_box_scs = "./Screenshots/email-box.png"
 okay_scs = "./Screenshots/okay.png"
@@ -30,25 +35,67 @@ send_scs = "./Screenshots/send.png"
 directory = "C:/Users/Muzna/Pictures/Screenshots"
 base_name = "result"
 
-
-
-error_msg_show = False
-
-
-# Starting Delay
-time.sleep(Starting_delay)
-
+# Functions 
 def play_sound(sound: str, dir: str, repeat: int):
-    for count in range(repeat):
-        playsound(os.path.join(dir, sound))
-        time.sleep(0.3)
+    # Function for a playing sound a set amount of times
+    for _ in range(repeat):
+        pygame.mixer.init()
+        pygame.mixer.Sound(os.path.join(dir, sound)).play()
+        time.sleep(0.6)
 
-# Defining a unique filename generator using a timestamp function
 def get_unique_filename(directory, base_name, extension=".png"):
+    # Defining a unique filename generator using a timestamp function
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = os.path.join(directory, f"{base_name}_{timestamp}{extension}")
     return filename
 
+def show_error_popup():
+    # Create the main application window if it doesn't exist
+    if not hasattr(show_error_popup, "root"):
+        show_error_popup.root = CTk()
+        set_appearance_mode("dark")
+
+    # Create the Toplevel window
+    error_popup = CTkToplevel(show_error_popup.root)
+    error_popup.geometry("300x150+1000+300")
+    error_popup.title("Error")
+
+    # Create and pack the error label
+    error_label = CTkLabel(error_popup, text="Error: Image Not Found", font=("Arial", 12), height=30, width=30, text_color="white")
+    error_label.pack(pady=20)
+
+    # Create and pack the buttons
+    close_button = CTkButton(error_popup, text="Close", width=60, height=40, command=error_popup.destroy)
+    close_button.pack()
+
+    # make the errror box pop up above programs
+    error_popup.attributes("-topmost", True)
+
+    # Start the event loop for the popup
+    error_popup.mainloop()
+    
+def send_twilio_message():
+    # sending a Whatsapp alert by twilio
+    client = Client(Private_keys.account_sid, Private_keys.auth_token)
+    message = client.messages.create(
+        from_=f'whatsapp:{Private_keys.twillio_default_number}',
+        body='Error: Automation has ended with an error!',
+        to=f'whatsapp:{Private_keys.user_phone_number}'
+    )
+
+def handle_error():
+    # Running all threads simoultaneously
+    global error_msg_show
+    if not error_msg_show:
+        error_msg_show = True
+        threading.Thread(target=play_sound, args=("alert.mp3", "Sounds", 4)).start()
+        threading.Thread(target=send_twilio_message).start()
+        show_error_popup()
+
+# Starting Delay
+time.sleep(starting_delay)
+
+# Looping over every tab
 for number in range(number_of_tabs + 1):
     try:
         # Clicking the Add Email option
@@ -106,24 +153,18 @@ for number in range(number_of_tabs + 1):
         # Taking a screenshot and saving it in the relevant directory
         pyautogui.screenshot(unique_filename)
 
-        # Closing current tab
+        # Switching current tab
         pyautogui.hotkey("ctrl", "tab")
 
+        # Closing current tab
+        if tab_close == True:
+            pyautogui.hotkey("ctrl", "W")
+
+    # Catching image not found error
     except pyautogui.ImageNotFoundException:
         if error_msg_show == False:
-            play_sound("alert.mp3", "Sounds", 4)
-            root = Tk("Error")
-            error_label = Label(text=f"Error: Image Not Found", font="Ariel", height=30, width=30) 
-            error_label.pack()
+            handle_error()
             error_msg_show = True
-            client = Client(Private_keys.account_sid, Private_keys.auth_token)
-
-            message = client.messages.create(
-            from_=f'whatsapp:{Private_keys.twillio_default_number}',
-            body='Error: Automation has ended with an error!',
-            to=f'whatsapp:{Private_keys.user_phone_number}'
-)
-            root.mainloop()
         else:
             break
         continue

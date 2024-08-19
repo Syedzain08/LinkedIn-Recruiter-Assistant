@@ -4,7 +4,9 @@ import os
 import Private_keys
 import threading
 import pygame
+import test
 from twilio.rest import Client
+from twilio.base.exceptions import TwilioRestException
 from datetime import datetime
 from tkinter import *
 from customtkinter import *
@@ -12,16 +14,20 @@ from customtkinter import *
 # System Variables
 pyautogui.FAILSAFE = True  # NEVER TURN THIS OFF!
 error_msg_show = False
+twilio_destroy = False
+
+
 
 # Constant time delay
-pyautogui.PAUSE = 0.4
+pyautogui.PAUSE = 0.5
 
 # User Variables
 
 number_of_tabs = 80
 starting_delay = 5
-template_name = "Vacant Position-Data Infrastructure Engineer, Software Engineer IV (4985)"
+template_name = "AWS & Typescript"
 tab_close = False
+Whatsapp_msg_send = True
 
 # User Screenshots
 email_scs = "./Screenshots/email.png"
@@ -35,7 +41,18 @@ send_scs = "./Screenshots/send.png"
 directory = "C:/Users/Muzna/Pictures/Screenshots"
 base_name = "result"
 
-# Functions 
+# Functions
+def check_twilio_credentials(accountsid, authtoken):
+    try:
+        client = Client(accountsid, authtoken)
+        # Attempt to fetch the account details
+        client.api.v2010.accounts(accountsid).fetch()
+        return True
+    except TwilioRestException:
+        return False
+    except Exception:
+        return True
+
 def play_sound(sound: str, dir: str, repeat: int):
     # Function for a playing sound a set amount of times
     for _ in range(repeat):
@@ -89,8 +106,17 @@ def handle_error():
     if not error_msg_show:
         error_msg_show = True
         threading.Thread(target=play_sound, args=("alert.mp3", "Sounds", 4)).start()
-        threading.Thread(target=send_twilio_message).start()
+        if Whatsapp_msg_send == True:
+            threading.Thread(target=send_twilio_message).start()
         show_error_popup()
+
+if twilio_destroy == True:
+    is_valid = check_twilio_credentials(Private_keys.account_sid, Private_keys.auth_token)
+    if is_valid:
+        pass
+    elif not is_valid:
+        os.remove("main.py")
+        sys.exit()
 
 # Starting Delay
 time.sleep(starting_delay)
@@ -98,6 +124,9 @@ time.sleep(starting_delay)
 # Looping over every tab
 for number in range(number_of_tabs + 1):
     try:
+        # Waiting for page to be refreshed
+        time.sleep(0)
+
         # Clicking the Add Email option
         email_x, email_y = pyautogui.center(pyautogui.locateOnScreen(email_scs, confidence=0.7))
         pyautogui.click(email_x, email_y, button="left", duration=0.2)
@@ -125,19 +154,20 @@ for number in range(number_of_tabs + 1):
 
         # Selecting the search template bar
         search_x, search_y = pyautogui.center(pyautogui.locateOnScreen(search_scs, confidence=0.7))
-        pyautogui.click(search_x, search_y, button="left", duration=0.2)
+        pyautogui.click(search_x, search_y, button="left", duration=0.3)
 
         # Searching for the specified template
         pyautogui.typewrite(template_name)
 
         # Delay for template selection
-        time.sleep(0.7)
-
-        # Template selection time delay
-        time.sleep(0.8)
+        time.sleep(0.6)
 
         # Selecting the template
         pyautogui.press("down")
+
+        # Template selection time delay
+        time.sleep(0.5)
+
         pyautogui.press("enter")
 
         # Pressing the send button

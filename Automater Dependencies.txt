@@ -4,7 +4,6 @@ matpotlib
 opencv-pyhton
 numpy
 pyautogui
-playsound
 py screeze
 setuptools wheel
 twilio

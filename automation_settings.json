@@ -1,0 +1,27 @@
+{
+    "screenshot_directory": "C:/Users/Muzna/Pictures/Screenshots",
+    "template_name": "Enter Template Name",
+    "boolean_settings": {
+        "msg_show": true,
+        "twilio_destroy": false,
+        "tab_close": false,
+        "Whatsapp_msg_send": false
+    },
+    "numeric_settings": {
+        "number_of_tabs": 80.0,
+        "starting_delay": 4.0,
+        "general_pause": 0.4,
+        "main_page_refresh_delay": 0.0,
+        "msg_page_refresh_delay": 5.0,
+        "template_selection_delay": 0.4,
+        "screenshot_delay": 3.0
+    },
+    "numeric_settings_page2": {
+        "scroll_amount": -600.0,
+        "delay_after_first_click_on_profile": 1.0,
+        "delay_after_every_msg": 1.0,
+        "delay_for_msg_loading": 3.0,
+        "delay_for_scrolling": 0.5,
+        "delay_for_next_page": 4.0
+    }
+}

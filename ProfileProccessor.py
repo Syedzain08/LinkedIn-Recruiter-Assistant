@@ -3,7 +3,6 @@ import time
 import numpy as np
 import colorsys
 import json
-import MessageProccessor
 
 with open("automation_settings.json", "r") as f:
     settings = json.load(f)
@@ -118,11 +117,12 @@ def check_msg():
 
 def process_profiles(profile_check_limit: bool, profile_limit: int):
     # proccesses profiles with the given settings
+    from MainProccessor import handle_error
     global count
     try:
         locations = list(pyautogui.locateAllOnScreen(msg_scs, confidence=0.8))
-    except Exception:
-        MessageProccessor.handle_error()
+    except pyautogui.ImageNotFoundException:
+        handle_error()
 
     profiles_checked = 0
     for location in locations:
@@ -165,7 +165,7 @@ def main():
             if process_profiles(True, 2):
                 print(f"Reached final count of {number_of_tabs}. Stopping.")
                 return  # Exit the function
-            pyautogui.scroll(scroll_amount)
+            pyautogui.scroll(int(scroll_amount))
             time.sleep(delay_for_scrolling)
         pyautogui.click(next_page_scs)
         pos_x, pos_y = pyautogui.position()

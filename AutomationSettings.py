@@ -6,6 +6,7 @@ class ScrollableFrame(ctk.CTkScrollableFrame):
     def __init__(self, container, *args, **kwargs):
         super().__init__(container, *args, **kwargs)
 
+
 class AutomationSettingsGUI:
     def __init__(self):
         self.root = ctk.CTk()
@@ -40,7 +41,16 @@ class AutomationSettingsGUI:
 
         self.dir_entry = ctk.CTkEntry(self.dir_frame, width=300)
         self.dir_entry.pack(side="left", padx=5)
-        self.dir_entry.insert(0, self.settings.get("screenshot_directory", "C:/Users/Muzna/Pictures/Screenshots") if self.settings else "C:/Users/Muzna/Pictures/Screenshots")
+        self.dir_entry.insert(
+            0,
+            (
+                self.settings.get(
+                    "screenshot_directory", "C:/Users/Muzna/Pictures/Screenshots"
+                )
+                if self.settings
+                else "C:/Users/Muzna/Pictures/Screenshots"
+            ),
+        )
 
         self.dir_button = ctk.CTkButton(
             self.dir_frame, text="Browse", command=self.browse_directory
@@ -52,10 +62,34 @@ class AutomationSettingsGUI:
         self.bool_frame.pack(pady=10, padx=10, fill="x")
 
         self.bool_vars = {
-            "msg_show": ctk.BooleanVar(value=self.settings["boolean_settings"]["msg_show"] if self.settings and "boolean_settings" in self.settings else False),
-            "twilio_destroy": ctk.BooleanVar(value=self.settings["boolean_settings"]["twilio_destroy"] if self.settings and "boolean_settings" in self.settings else False),
-            "tab_close": ctk.BooleanVar(value=self.settings["boolean_settings"]["tab_close"] if self.settings and "boolean_settings" in self.settings else False),
-            "Whatsapp_msg_send": ctk.BooleanVar(value=self.settings["boolean_settings"]["Whatsapp_msg_send"] if self.settings and "boolean_settings" in self.settings else False),
+            "msg_show": ctk.BooleanVar(
+                value=(
+                    self.settings["boolean_settings"]["msg_show"]
+                    if self.settings and "boolean_settings" in self.settings
+                    else False
+                )
+            ),
+            "twilio_destroy": ctk.BooleanVar(
+                value=(
+                    self.settings["boolean_settings"]["twilio_destroy"]
+                    if self.settings and "boolean_settings" in self.settings
+                    else False
+                )
+            ),
+            "tab_close": ctk.BooleanVar(
+                value=(
+                    self.settings["boolean_settings"]["tab_close"]
+                    if self.settings and "boolean_settings" in self.settings
+                    else False
+                )
+            ),
+            "Whatsapp_msg_send": ctk.BooleanVar(
+                value=(
+                    self.settings["boolean_settings"]["Whatsapp_msg_send"]
+                    if self.settings and "boolean_settings" in self.settings
+                    else False
+                )
+            ),
         }
 
         for i, (key, var) in enumerate(self.bool_vars.items()):
@@ -71,20 +105,69 @@ class AutomationSettingsGUI:
 
         self.template_entry = ctk.CTkEntry(self.template_frame, width=300)
         self.template_entry.pack(side="left", padx=5)
-        self.template_entry.insert(0, self.settings.get("template_name", "Enter Template Name") if self.settings else "Enter Template Name")
+        self.template_entry.insert(
+            0,
+            (
+                self.settings.get("template_name", "Enter Template Name")
+                if self.settings
+                else "Enter Template Name"
+            ),
+        )
 
         # Numeric inputs
         self.num_frame = ctk.CTkFrame(self.scrollable_frame)
         self.num_frame.pack(pady=10, padx=10, fill="x")
 
         self.num_vars = {
-            "number_of_tabs": ctk.StringVar(value=str(self.settings["numeric_settings"]["number_of_tabs"]) if self.settings and "numeric_settings" in self.settings else "80"),
-            "starting_delay": ctk.StringVar(value=str(self.settings["numeric_settings"]["starting_delay"]) if self.settings and "numeric_settings" in self.settings else "4"),
-            "general_pause": ctk.StringVar(value=str(self.settings["numeric_settings"]["general_pause"]) if self.settings and "numeric_settings" in self.settings else "0.4"),
-            "main_page_refresh_delay": ctk.StringVar(value=str(self.settings["numeric_settings"]["main_page_refresh_delay"]) if self.settings and "numeric_settings" in self.settings else "0"),
-            "msg_page_refresh_delay": ctk.StringVar(value=str(self.settings["numeric_settings"]["msg_page_refresh_delay"]) if self.settings and "numeric_settings" in self.settings else "5"),
-            "template_selection_delay": ctk.StringVar(value=str(self.settings["numeric_settings"]["template_selection_delay"]) if self.settings and "numeric_settings" in self.settings else "0.4"),
-            "screenshot_delay": ctk.StringVar(value=str(self.settings["numeric_settings"]["screenshot_delay"]) if self.settings and "numeric_settings" in self.settings else "3"),
+            "number_of_tabs": ctk.StringVar(
+                value=(
+                    str(self.settings["numeric_settings"]["number_of_tabs"])
+                    if self.settings and "numeric_settings" in self.settings
+                    else "80"
+                )
+            ),
+            "starting_delay": ctk.StringVar(
+                value=(
+                    str(self.settings["numeric_settings"]["starting_delay"])
+                    if self.settings and "numeric_settings" in self.settings
+                    else "4"
+                )
+            ),
+            "general_pause": ctk.StringVar(
+                value=(
+                    str(self.settings["numeric_settings"]["general_pause"])
+                    if self.settings and "numeric_settings" in self.settings
+                    else "0.4"
+                )
+            ),
+            "main_page_refresh_delay": ctk.StringVar(
+                value=(
+                    str(self.settings["numeric_settings"]["main_page_refresh_delay"])
+                    if self.settings and "numeric_settings" in self.settings
+                    else "0"
+                )
+            ),
+            "msg_page_refresh_delay": ctk.StringVar(
+                value=(
+                    str(self.settings["numeric_settings"]["msg_page_refresh_delay"])
+                    if self.settings and "numeric_settings" in self.settings
+                    else "5"
+                )
+            ),
+            "template_selection_delay": ctk.StringVar(
+                value=(
+                    str(self.settings["numeric_settings"]["template_selection_delay"])
+                    if self.settings and "numeric_settings" in self.settings
+                    else "0.4"
+                )
+            ),
+            "screenshot_delay": ctk.StringVar(
+                value=(
+                    str(self.settings["numeric_settings"]["screenshot_delay"])
+                    if self.settings and "numeric_settings" in self.settings
+                    else "3"
+                )
+            ),
         }
 
         for i, (key, var) in enumerate(self.num_vars.items()):
@@ -98,15 +181,66 @@ class AutomationSettingsGUI:
         self.num_frame2.pack(pady=10, padx=10, fill="x")
 
         self.num_vars2 = {
-            "scroll_amount": ctk.StringVar(value=str(self.settings["numeric_settings_page2"]["scroll_amount"]) if self.settings and "numeric_settings_page2" in self.settings else "-600"),
-            "delay_after_first_click_on_profile": ctk.StringVar(value=str(self.settings["numeric_settings_page2"]["delay_after_first_click_on_profile"]) if self.settings and "numeric_settings_page2" in self.settings else "1"),
-            "delay_after_every_msg": ctk.StringVar(value=str(self.settings["numeric_settings_page2"]["delay_after_every_msg"]) if self.settings and "numeric_settings_page2" in self.settings else "1"),
-            "delay_for_msg_loading": ctk.StringVar(value=str(self.settings["numeric_settings_page2"]["delay_for_msg_loading"]) if self.settings and "numeric_settings_page2" in self.settings else "3"),
-            "delay_for_scrolling": ctk.StringVar(value=str(self.settings["numeric_settings_page2"]["delay_for_scrolling"]) if self.settings and "numeric_settings_page2" in self.settings else "0.5"),
-            "delay_for_next_page": ctk.StringVar(value=str(self.settings["numeric_settings_page2"]["delay_for_next_page"]) if self.settings and "numeric_settings_page2" in self.settings else "4"),
+            "scroll_amount": ctk.StringVar(
+                value=(
+                    str(self.settings["numeric_settings_page2"]["scroll_amount"])
+                    if self.settings and "numeric_settings_page2" in self.settings
+                    else "-600"
+                )
+            ),
+            "profiles_to_check": ctk.StringVar(
+                value=(
+                    str(self.settings["numeric_settings_page2"]["profiles_to_check"])
+                    if self.settings and "numeric_settings_page2" in self.settings
+                    else "2"
+                )
+            ),
+            "delay_after_first_click_on_profile": ctk.StringVar(
+                value=(
+                    str(
+                        self.settings["numeric_settings_page2"][
+                            "delay_after_first_click_on_profile"
+                        ]
+                    )
+                    if self.settings and "numeric_settings_page2" in self.settings
+                    else "1"
+                )
+            ),
+            "delay_after_every_msg": ctk.StringVar(
+                value=(
+                    str(
+                        self.settings["numeric_settings_page2"]["delay_after_every_msg"]
+                    )
+                    if self.settings and "numeric_settings_page2" in self.settings
+                    else "1"
+                )
+            ),
+            "delay_for_msg_loading": ctk.StringVar(
+                value=(
+                    str(
+                        self.settings["numeric_settings_page2"]["delay_for_msg_loading"]
+                    )
+                    if self.settings and "numeric_settings_page2" in self.settings
+                    else "3"
+                )
+            ),
+            "delay_for_scrolling": ctk.StringVar(
+                value=(
+                    str(self.settings["numeric_settings_page2"]["delay_for_scrolling"])
+                    if self.settings and "numeric_settings_page2" in self.settings
+                    else "0.5"
+                )
+            ),
+            "delay_for_next_page": ctk.StringVar(
+                value=(
+                    str(self.settings["numeric_settings_page2"]["delay_for_next_page"])
+                    if self.settings and "numeric_settings_page2" in self.settings
+                    else "4"
+                )
+            ),
         }
 
-        ctk.CTkLabel(self.num_frame2, text="Second Page Settings:").grid(
+        ctk.CTkLabel(self.num_frame2, text="Search Page Settings:").grid(
             row=0, column=0, columnspan=2, pady=5, padx=10, sticky="w"
         )
 
@@ -125,14 +259,28 @@ class AutomationSettingsGUI:
         )
 
         self.twilio_vars = {
-            "account_sid": ctk.StringVar(value=self.settings.get("twilio_settings", {}).get("account_sid", "N/A")),
-            "auth_token": ctk.StringVar(value=self.settings.get("twilio_settings", {}).get("auth_token", "N/A")),
-            "twilio_default_number": ctk.StringVar(value=self.settings.get("twilio_settings", {}).get("twilio_default_number", "N/A")),
-            "user_phone_number": ctk.StringVar(value=self.settings.get("twilio_settings", {}).get("user_phone_number", "N/A")),
+            "account_sid": ctk.StringVar(
+                value=self.settings.get("twilio_settings", {}).get("account_sid", "N/A")
+            ),
+            "auth_token": ctk.StringVar(
+                value=self.settings.get("twilio_settings", {}).get("auth_token", "N/A")
+            ),
+            "twilio_default_number": ctk.StringVar(
+                value=self.settings.get("twilio_settings", {}).get(
+                    "twilio_default_number", "N/A"
+                )
+            ),
+            "user_phone_number": ctk.StringVar(
+                value=self.settings.get("twilio_settings", {}).get(
+                    "user_phone_number", "N/A"
+                )
+            ),
         }
 
         for i, (key, var) in enumerate(self.twilio_vars.items(), start=1):
-            label = ctk.CTkLabel(self.twilio_frame, text=f"{key.replace('_', ' ').title()}:")
+            label = ctk.CTkLabel(
+                self.twilio_frame, text=f"{key.replace('_', ' ').title()}:"
+            )
             label.grid(row=i, column=0, pady=5, padx=10, sticky="e")
             entry = ctk.CTkEntry(self.twilio_frame, textvariable=var, width=300)
             entry.grid(row=i, column=1, pady=5, padx=10, sticky="w")
@@ -158,9 +306,7 @@ class AutomationSettingsGUI:
             "numeric_settings_page2": {
                 k: float(v.get()) for k, v in self.num_vars2.items()
             },
-            "twilio_settings": {
-                k: v.get() for k, v in self.twilio_vars.items()
-            },
+            "twilio_settings": {k: v.get() for k, v in self.twilio_vars.items()},
         }
 
         with open("automation_settings.json", "w") as f:
@@ -170,6 +316,7 @@ class AutomationSettingsGUI:
 
     def run(self):
         self.root.mainloop()
+
 
 if __name__ == "__main__":
     settings = AutomationSettingsGUI()

@@ -16,6 +16,8 @@ delay_for_msg_loading = settings["numeric_settings_page2"]["delay_for_msg_loadin
 delay_for_scrolling = settings["numeric_settings_page2"]["delay_for_scrolling"]
 delay_for_next_page = settings["numeric_settings_page2"]["delay_for_next_page"]
 scroll_amount = settings["numeric_settings_page2"]["scroll_amount"]
+profiles_to_check = settings["numeric_settings_page2"]["profiles_to_check"]
+
 
 # screenshot vars
 activity_bar_scs = "./Screenshots/activity-bar.png"
@@ -118,6 +120,7 @@ def check_msg():
 def process_profiles(profile_check_limit: bool, profile_limit: int):
     # proccesses profiles with the given settings
     from MainProccessor import handle_error
+
     global count
     try:
         locations = list(pyautogui.locateAllOnScreen(msg_scs, confidence=0.8))
@@ -151,7 +154,7 @@ def reached_end_of_results():
     # checks if end of page has been reached
     try:
         pyautogui.locateOnScreen(end_of_results_scs, confidence=0.9)
-        process_profiles(False, 2)
+        process_profiles(False, profiles_to_check)
         return True
     except pyautogui.ImageNotFoundException:
         return False
@@ -162,7 +165,7 @@ def main():
     global count
     while count < number_of_tabs:
         while not reached_end_of_results():
-            if process_profiles(True, 2):
+            if process_profiles(True, profiles_to_check):
                 print(f"Reached final count of {number_of_tabs}. Stopping.")
                 return  # Exit the function
             pyautogui.scroll(int(scroll_amount))

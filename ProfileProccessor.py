@@ -16,7 +16,6 @@ delay_for_msg_loading = settings["numeric_settings_page2"]["delay_for_msg_loadin
 delay_for_scrolling = settings["numeric_settings_page2"]["delay_for_scrolling"]
 delay_for_next_page = settings["numeric_settings_page2"]["delay_for_next_page"]
 scroll_amount = settings["numeric_settings_page2"]["scroll_amount"]
-profiles_to_check = settings["numeric_settings_page2"]["profiles_to_check"]
 distance_to_msg = settings["numeric_settings_page2"]["distance_to_msg"]
 purple_threshold = settings["numeric_settings_page2"]["purple_threshold"]
 
@@ -64,53 +63,28 @@ def is_purple():
 
     purple_ratio = np.sum(purple_pixels) / len(purple_pixels)
     print(purple_ratio)
-
     return purple_ratio > purple_threshold
 
 
-def is_faded():
-    # checks if profile name is grey
-    x, y = pyautogui.position()
-    region = (int(x - 5), int(y - 5), 10, 10)  # Larger region
+def is_faded(x, y, threshold=20):
+    # checks if message button is faded
+    region = (int(x - 1), int(y - 1), 3, 3)
     im = pyautogui.screenshot(region=region)
-
-    # Convert image to numpy array
-    im_array = np.array(im)
-
-    # Convert RGB to HSV
-    hsv_array = np.array(
-        [colorsys.rgb_to_hsv(*(color / 255)) for color in im_array.reshape(-1, 3)]
-    )
-
-    # Define grey range in HSV
-    # Grey has low saturation and medium to high value
-    saturation_threshold = 0.5
-    value_range = (0.5, 1.5)
-
-    # Check if any pixel falls within the grey range
-    grey_pixels = np.logical_and(
-        hsv_array[:, 1] <= saturation_threshold,
-        np.logical_and(
-            hsv_array[:, 2] >= value_range[0], hsv_array[:, 2] <= value_range[1]
-        ),
-    )
-
-    grey_ratio = np.sum(grey_pixels) / len(grey_pixels)
-    print(grey_ratio)
-
-    return grey_ratio > 0.9  # Adjust this threshold as needed
+    color = im.getpixel((1, 1))
+    faded_color = (200, 200, 200)
+    return all(abs(c1 - c2) < threshold for c1, c2 in zip(color, faded_color))
 
 
 def has_been_messaged():
     # checks if a person has been messaged
     current_pos_x, current_pos_y = pyautogui.position()
-    adjusted_x = current_pos_x - distance_to_msg
+    adjusted_x = current_pos_x - 1260
     pyautogui.moveTo(adjusted_x, current_pos_y)
     pyautogui.moveTo(adjusted_x, (current_pos_y - 1))
     if is_purple():
         return True
     else:
-        pyautogui.move(-100, 0)
+        pyautogui.move(-150, 0)
         pos_x, pos_y = pyautogui.position()
         search_region = (pos_x, pos_y, 900, 400)
         try:
@@ -130,8 +104,7 @@ def check_msg():
     try:
         pyautogui.locateOnScreen(inmail_credits_scs, confidence=0.9)
         current_x, current_y = pyautogui.position()
-        new_y = current_y - 10
-        pyautogui.moveTo(max(current_x - distance_to_msg, 0), new_y)
+        pyautogui.moveTo(max(current_x - distance_to_msg, 0), current_y)
         pyautogui.click()
         time.sleep(delay_after_first_click_on_profile)
         pyautogui.rightClick()
@@ -147,7 +120,6 @@ def check_msg():
 def process_profiles(profile_check_limit: bool, profile_limit: int):
     # proccesses profiles with the given settings
     from MainProccessor import handle_error
-
     global count
     try:
         locations = list(pyautogui.locateAllOnScreen(msg_scs, confidence=0.8))
@@ -159,7 +131,7 @@ def process_profiles(profile_check_limit: bool, profile_limit: int):
         x, y = pyautogui.center(location)
         pyautogui.moveTo(x, y)
 
-        if is_faded():
+        if is_faded(x, y):
             profiles_checked += 1
             continue
 
@@ -181,7 +153,7 @@ def reached_end_of_results():
     # checks if end of page has been reached
     try:
         pyautogui.locateOnScreen(end_of_results_scs, confidence=0.9)
-        process_profiles(False, profiles_to_check)
+        process_profiles(False, 2)
         return True
     except pyautogui.ImageNotFoundException:
         return False
@@ -192,7 +164,7 @@ def main():
     global count
     while count < number_of_tabs:
         while not reached_end_of_results():
-            if process_profiles(True, profiles_to_check):
+            if process_profiles(True, 2):
                 print(f"Reached final count of {number_of_tabs}. Stopping.")
                 return  # Exit the function
             pyautogui.scroll(int(scroll_amount))

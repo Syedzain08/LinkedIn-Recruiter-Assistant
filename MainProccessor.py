@@ -53,6 +53,14 @@ search_page_scs = "./Screenshots/search-page.png"
 
 
 # Functions
+def close_and_exit(root):
+    def close_program():
+        root.destroy()
+        sys.exit()
+
+    return close_program
+
+
 def check_twilio_credentials(accountsid, authtoken):
     try:
         client = Client(accountsid, authtoken)
@@ -97,9 +105,12 @@ def show_popup(title: str, msg: str):
     )
     popup_label.pack(pady=20)
 
+    # make a closing function instance
+    close_program = close_and_exit(popup)
+
     # Create and pack the buttons
     close_button = CTkButton(
-        popup, text="Close", width=60, height=40, command=popup.destroy
+        popup, text="Close", width=60, height=40, command=close_program
     )
     close_button.pack()
 
@@ -151,9 +162,7 @@ def handle_completion():
 
 
 if twilio_destroy == True:
-    is_valid = check_twilio_credentials(
-        account_sid, auth_token
-    )
+    is_valid = check_twilio_credentials(account_sid, auth_token)
     if is_valid:
         pass
     elif not is_valid:

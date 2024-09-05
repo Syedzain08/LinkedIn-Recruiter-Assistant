@@ -9,6 +9,3 @@ setuptools wheel
 twilio
 pygame
 custom tkinter
-
-
-Private_keys

@@ -1,5 +1,5 @@
 {
-    "screenshot_directory": "C:/Users/Muzna/Pictures/Screenshots",
+    "screenshot_directory": "C:/Users/HP Notebook/Pictures/Screenshots",
     "template_name": "Quality Engineer",
     "boolean_settings": {
         "msg_show": true,
@@ -12,14 +12,16 @@
         "starting_delay": 4.0,
         "general_pause": 0.3,
         "main_page_refresh_delay": 0.0,
-        "msg_page_refresh_delay": 5.0,
+        "msg_page_refresh_delay": 6.0,
         "template_selection_delay": 0.3,
         "screenshot_delay": 3.0
     },
     "numeric_settings_page2": {
-        "scroll_amount": -600.0,
-        "profiles_to_check": 2.0,
-        "delay_after_first_click_on_profile": 1.0,
+        "scroll_amount": -400.0,
+        "profiles_to_check": 1.0,
+        "distance_to_msg": 780.0,
+        "purple_threshold": 0.1,
+        "delay_after_first_click_on_profile": 2.0,
         "delay_after_every_msg": 1.0,
         "delay_for_msg_loading": 1.0,
         "delay_for_scrolling": 0.5,
@@ -29,6 +31,6 @@
         "account_sid": "ACa01ad346b90457c0c107fefe8f0d91fb",
         "auth_token": "",
         "twilio_default_number": "+14155238886",
-        "user_phone_number": "+923001834636"
+        "user_phone_number": ""
     }
 }

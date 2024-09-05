@@ -195,6 +195,20 @@ class AutomationSettingsGUI:
                     else "2"
                 )
             ),
+            "distance_to_msg": ctk.StringVar(
+                value=(
+                    str(self.settings["numeric_settings_page2"]["distance_to_msg"])
+                    if self.settings and "numeric_settings_page2" in self.settings
+                    else "780"
+                )
+            ),
+            "purple_threshold": ctk.StringVar(
+                value=(
+                    str(self.settings["numeric_settings_page2"]["purple_threshold"])
+                    if self.settings and "numeric_settings_page2" in self.settings
+                    else "0.1"
+                )
+            ),
             "delay_after_first_click_on_profile": ctk.StringVar(
                 value=(
                     str(

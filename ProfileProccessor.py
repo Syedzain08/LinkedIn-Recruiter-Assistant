@@ -78,7 +78,7 @@ def is_faded(x, y, threshold=20):
 def has_been_messaged():
     # checks if a person has been messaged
     current_pos_x, current_pos_y = pyautogui.position()
-    adjusted_x = current_pos_x - 1260
+    adjusted_x = current_pos_x - distance_to_msg
     pyautogui.moveTo(adjusted_x, current_pos_y)
     pyautogui.moveTo(adjusted_x, (current_pos_y - 1))
     if is_purple():

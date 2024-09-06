@@ -69,13 +69,6 @@ class AutomationSettingsGUI:
                     else False
                 )
             ),
-            "twilio_destroy": ctk.BooleanVar(
-                value=(
-                    self.settings["boolean_settings"]["twilio_destroy"]
-                    if self.settings and "boolean_settings" in self.settings
-                    else False
-                )
-            ),
             "tab_close": ctk.BooleanVar(
                 value=(
                     self.settings["boolean_settings"]["tab_close"]

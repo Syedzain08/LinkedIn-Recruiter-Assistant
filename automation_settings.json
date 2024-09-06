@@ -3,7 +3,6 @@
     "template_name": "Quality Engineer",
     "boolean_settings": {
         "msg_show": true,
-        "twilio_destroy": false,
         "tab_close": false,
         "Whatsapp_msg_send": false
     },
@@ -29,7 +28,7 @@
     },
     "twilio_settings": {
         "account_sid": "ACa01ad346b90457c0c107fefe8f0d91fb",
-        "auth_token": "",
+        "auth_token": "1fb04ae7cd8cb263b904066fb29b6654",
         "twilio_default_number": "+14155238886",
         "user_phone_number": ""
     }

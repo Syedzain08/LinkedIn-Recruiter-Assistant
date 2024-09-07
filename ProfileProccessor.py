@@ -18,6 +18,7 @@ delay_for_next_page = settings["numeric_settings_page2"]["delay_for_next_page"]
 scroll_amount = settings["numeric_settings_page2"]["scroll_amount"]
 distance_to_msg = settings["numeric_settings_page2"]["distance_to_msg"]
 purple_threshold = settings["numeric_settings_page2"]["purple_threshold"]
+profiles_to_check = settings["numeric_settings_page2"]["profiles_to_check"]
 
 # screenshot vars
 activity_bar_scs = "./Screenshots/activity-bar.png"
@@ -164,7 +165,7 @@ def main():
     global count
     while count < number_of_tabs:
         while not reached_end_of_results():
-            if process_profiles(True, 2):
+            if process_profiles(True, profiles_to_check):
                 print(f"Reached final count of {number_of_tabs}. Stopping.")
                 return  # Exit the function
             pyautogui.scroll(int(scroll_amount))

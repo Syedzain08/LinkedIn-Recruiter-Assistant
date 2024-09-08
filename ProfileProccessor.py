@@ -18,6 +18,7 @@ delay_for_next_page = settings["numeric_settings_page2"]["delay_for_next_page"]
 scroll_amount = settings["numeric_settings_page2"]["scroll_amount"]
 distance_to_msg = settings["numeric_settings_page2"]["distance_to_msg"]
 purple_threshold = settings["numeric_settings_page2"]["purple_threshold"]
+grey_threshold = settings["numeric_settings_page2"]["grey_threshold"]
 profiles_to_check = settings["numeric_settings_page2"]["profiles_to_check"]
 
 # screenshot vars
@@ -67,13 +68,31 @@ def is_purple():
     return purple_ratio > purple_threshold
 
 
-def is_faded(x, y, threshold=20):
-    # checks if message button is faded
-    region = (int(x - 1), int(y - 1), 3, 3)
+def is_faded():
+    # Define the target grey color in RGB
+    target_rgb = np.array([200, 200, 200])
+    tolerance = 30  # Allowable deviation from the target color
+
+    # Get the current position of the mouse and define the region
+    x, y = pyautogui.position()
+    region = (int(x - 1), int(y - 1), 5, 5)  # Larger region
     im = pyautogui.screenshot(region=region)
-    color = im.getpixel((1, 1))
-    faded_color = (200, 200, 200)
-    return all(abs(c1 - c2) < threshold for c1, c2 in zip(color, faded_color))
+
+    # Convert image to numpy array
+    im_array = np.array(im)
+
+    # Calculate the difference between each pixel and the target grey
+    color_diff = np.linalg.norm(im_array - target_rgb, axis=2)
+
+    # Determine if any pixel is within the tolerance range
+    grey_pixels = color_diff <= tolerance
+
+    # Calculate the ratio of grey pixels
+    grey_ratio = np.sum(grey_pixels) / grey_pixels.size
+    print(grey_ratio)
+
+    # Define a threshold to determine if the majority of the region is grey
+    return grey_ratio > grey_threshold
 
 
 def has_been_messaged():
@@ -121,6 +140,7 @@ def check_msg():
 def process_profiles(profile_check_limit: bool, profile_limit: int):
     # proccesses profiles with the given settings
     from MainProccessor import handle_error
+
     global count
     try:
         locations = list(pyautogui.locateAllOnScreen(msg_scs, confidence=0.8))

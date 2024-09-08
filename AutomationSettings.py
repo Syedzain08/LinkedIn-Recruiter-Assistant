@@ -202,6 +202,13 @@ class AutomationSettingsGUI:
                     else "0.1"
                 )
             ),
+            "grey_threshold": ctk.StringVar(
+                value=(
+                    str(self.settings["numeric_settings_page2"]["grey_threshold"])
+                    if self.settings and "numeric_settings_page2" in self.settings
+                    else "0.19"
+                )
+            ),
             "delay_after_first_click_on_profile": ctk.StringVar(
                 value=(
                     str(

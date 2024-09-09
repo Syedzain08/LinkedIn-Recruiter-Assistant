@@ -12,6 +12,7 @@
         "general_pause": 0.3,
         "main_page_refresh_delay": 0.0,
         "msg_page_refresh_delay": 6.0,
+        "msg_box_selection_delay": 0.0,
         "template_selection_delay": 0.3,
         "screenshot_delay": 3.0
     },
@@ -20,6 +21,7 @@
         "profiles_to_check": 1.0,
         "distance_to_msg": 780.0,
         "purple_threshold": 0.1,
+        "grey_threshold": 0.19,
         "delay_after_first_click_on_profile": 2.0,
         "delay_after_every_msg": 1.0,
         "delay_for_msg_loading": 1.0,

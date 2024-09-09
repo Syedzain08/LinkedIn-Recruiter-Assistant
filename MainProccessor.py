@@ -27,6 +27,7 @@ starting_delay = settings["numeric_settings"]["starting_delay"]
 general_pause = settings["numeric_settings"]["general_pause"]
 main_page_refresh_delay = settings["numeric_settings"]["main_page_refresh_delay"]
 msg_page_refresh_delay = settings["numeric_settings"]["msg_page_refresh_delay"]
+msg_box_selection_delay = settings["numeric_settings"]["msg_box_selection_delay"]
 template_selection_delay = settings["numeric_settings"]["template_selection_delay"]
 screenshot_delay = settings["numeric_settings"]["screenshot_delay"]
 account_sid = settings["twilio_settings"]["account_sid"]
@@ -181,7 +182,9 @@ if twilio_destroy == True:
             "AutomationSettings.exe",
             "automation_settings.json",
             "ProfileProccessor.py",
-            "MainProccessor.py" "MainProccessor.spec",
+            "MainProccessor.py",
+            "MainProccessor.spec",
+            "MainProccessor.exe",
         ]
         parent_dir = os.getcwd()
         for filename in files_to_delete:
@@ -234,7 +237,11 @@ for number in range(int(number_of_tabs)):
         email_box_x, email_box_y = pyautogui.center(
             pyautogui.locateOnScreen(email_box_scs, confidence=0.7)
         )
-        pyautogui.click(email_box_x, email_box_y, button="left", duration=0.2)
+
+        # Delay before clicking the Email Box
+        time.sleep(msg_box_selection_delay)
+
+        pyautogui.click(email_box_x, email_box_y, button="left")
 
         # Typing an Email into the box
         pyautogui.typewrite("a@gmail.com")
@@ -249,7 +256,7 @@ for number in range(int(number_of_tabs)):
         msg_x, msg_y = pyautogui.center(
             pyautogui.locateOnScreen(msg_scs, confidence=0.7)
         )
-        pyautogui.click(msg_x, msg_y, button="left", duration=0.2)
+        pyautogui.click(msg_x, msg_y, button="left")
 
         # Reloading the page
         pyautogui.hotkey("F5")
@@ -261,7 +268,7 @@ for number in range(int(number_of_tabs)):
         search_x, search_y = pyautogui.center(
             pyautogui.locateOnScreen(search_scs, confidence=0.7)
         )
-        pyautogui.click(search_x, search_y, button="left", duration=0.2)
+        pyautogui.click(search_x, search_y, button="left")
 
         # Searching for the specified template
         pyautogui.typewrite(template_name)

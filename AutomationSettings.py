@@ -147,6 +147,13 @@ class AutomationSettingsGUI:
                     else "5"
                 )
             ),
+            "msg_box_selection_delay": ctk.StringVar(
+                value=(
+                    str(self.settings["numeric_settings"]["msg_box_selection_delay"])
+                    if self.settings and "numeric_settings" in self.settings
+                    else "0.0"
+                )
+            ),
             "template_selection_delay": ctk.StringVar(
                 value=(
                     str(self.settings["numeric_settings"]["template_selection_delay"])

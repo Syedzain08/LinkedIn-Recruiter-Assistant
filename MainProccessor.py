@@ -1,20 +1,38 @@
-import pyautogui
-import time
-import os
-import threading
-import pygame
-import ProfileProccessor
-import json
-import shutil
+# Imports
+
+from time import sleep
+from os import path, getcwd, remove
+from threading import Thread
+from pygame import mixer
+from ProfileProccessor import main
+from json import load
+from shutil import rmtree
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
 from datetime import datetime
-from tkinter import *
-from customtkinter import *
+from customtkinter import (
+    sys,
+    CTk,
+    set_appearance_mode,
+    CTkToplevel,
+    CTkLabel,
+    CTkButton,
+)
+from pyautogui import (
+    FAILSAFE,
+    PAUSE,
+    locateOnScreen,
+    ImageNotFoundException,
+    hotkey,
+    center,
+    press,
+    click,
+    typewrite,
+)
 
 # Load settings
 with open("automation_settings.json", "r") as f:
-    settings = json.load(f)
+    settings = load(f)
 
 # Apply settings
 directory = settings["screenshot_directory"]
@@ -29,19 +47,18 @@ main_page_refresh_delay = settings["numeric_settings"]["main_page_refresh_delay"
 msg_page_refresh_delay = settings["numeric_settings"]["msg_page_refresh_delay"]
 msg_box_selection_delay = settings["numeric_settings"]["msg_box_selection_delay"]
 template_selection_delay = settings["numeric_settings"]["template_selection_delay"]
-screenshot_delay = settings["numeric_settings"]["screenshot_delay"]
 account_sid = settings["twilio_settings"]["account_sid"]
 auth_token = settings["twilio_settings"]["auth_token"]
 twillio_default_number = settings["twilio_settings"]["twilio_default_number"]
 user_phone_number = settings["twilio_settings"]["user_phone_number"]
+email = settings["email_name"]
 
 
 # System Variables
-pyautogui.FAILSAFE = True  # NEVER TURN THIS OFF!
-twilio_destroy = True
+FAILSAFE = True  # NEVER TURN THIS OFF!
 
 # Constant time delay
-pyautogui.PAUSE = general_pause
+PAUSE = general_pause
 
 # User Screenshots
 email_scs = "./Screenshots/email.png"
@@ -78,15 +95,15 @@ def check_twilio_credentials(accountsid, authtoken):
 def play_sound(sound: str, dir: str, repeat: int):
     # Function for a playing sound a set amount of times
     for _ in range(repeat):
-        pygame.mixer.init()
-        pygame.mixer.Sound(os.path.join(dir, sound)).play()
-        time.sleep(0.7)
+        mixer.init()
+        mixer.Sound(path.join(dir, sound)).play()
+        sleep(0.7)
 
 
 def get_unique_filename(directory, base_name, extension=".png"):
     # Defining a unique filename generator using a timestamp function
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = os.path.join(directory, f"{base_name}_{timestamp}{extension}")
+    filename = path.join(directory, f"{base_name}_{timestamp}{extension}")
     return filename
 
 
@@ -137,9 +154,9 @@ def handle_error():
     global msg_show
     if msg_show == True:
         msg_show = True
-        threading.Thread(target=play_sound, args=("alert.mp3", "Sounds", 4)).start()
+        Thread(target=play_sound, args=("alert.mp3", "Sounds", 4)).start()
         if Whatsapp_msg_send == True:
-            threading.Thread(
+            Thread(
                 target=send_twilio_message(
                     text="Error: Automation has ended with an error!"
                 )
@@ -151,30 +168,27 @@ def handle_completion():
     global msg_show
     if msg_show:
         msg_show = True
-        threading.Thread(
-            target=play_sound, args=("completion.mp3", "Sounds", 1)
-        ).start()
+        Thread(target=play_sound, args=("completion.mp3", "Sounds", 1)).start()
         show_popup("Complete", "Process finished!!")
         if Whatsapp_msg_send == True:
-            threading.Thread(
+            Thread(
                 target=send_twilio_message(
                     text="Success: Automater completed task successfully"
                 )
             ).start()
 
 
-if twilio_destroy == True:
-    is_valid = check_twilio_credentials(account_sid, auth_token)
-    if is_valid:
-        pass
-    else:
-        dir_to_delete = "/Sounds"
-        if os.path.exists(dir_to_delete):
-            try:
-                shutil.rmtree(dir_to_delete)
-                print(f"Successfully deleted directory: {dir_to_delete}")
-            except Exception:
-                pass
+is_valid = check_twilio_credentials(account_sid, auth_token)
+if is_valid:
+    pass
+else:
+    dir_to_delete = "/Sounds"
+    if path.exists(dir_to_delete):
+        try:
+            rmtree(dir_to_delete)
+            print(f"Successfully deleted directory: {dir_to_delete}")
+        except Exception:
+            pass
 
         files_to_delete = [
             "AutomationSettings.py",
@@ -186,12 +200,12 @@ if twilio_destroy == True:
             "MainProccessor.spec",
             "MainProccessor.exe",
         ]
-        parent_dir = os.getcwd()
+        parent_dir = getcwd()
         for filename in files_to_delete:
-            file_path = os.path.join(parent_dir, filename)
-            if os.path.exists(file_path):
+            file_path = path.join(parent_dir, filename)
+            if path.exists(file_path):
                 try:
-                    os.remove(file_path)
+                    remove(file_path)
                 except Exception:
                     continue
         sys.exit()
@@ -199,119 +213,98 @@ if twilio_destroy == True:
 
 def is_search_page():
     try:
-        pyautogui.locateOnScreen(search_page_scs)
+        locateOnScreen(search_page_scs)
         return True
-    except pyautogui.ImageNotFoundException:
+    except ImageNotFoundException:
         return False
 
 
-def is_cpc():
+def is_ending_page():
     try:
-        pyautogui.locateOnScreen(cpc_page_scs)
+        locateOnScreen(cpc_page_scs)
         return True
-    except pyautogui.ImageNotFoundException:
+    except ImageNotFoundException:
         return False
 
 
 if is_search_page():
-    time.sleep(2)
-    ProfileProccessor.main()
-    pyautogui.hotkey("ctrl", "tab")
+    sleep(2)
+    main()
+    hotkey("ctrl", "tab")
 
 # Starting Delay
-time.sleep(starting_delay)
+sleep(starting_delay)
 
 # Looping over every tab
 for number in range(int(number_of_tabs)):
     try:
         # Waiting for page to be refreshed
-        time.sleep(main_page_refresh_delay)
+        sleep(main_page_refresh_delay)
 
         # Clicking the Add Email option
-        email_x, email_y = pyautogui.center(
-            pyautogui.locateOnScreen(email_scs, confidence=0.7)
-        )
-        pyautogui.click(email_x, email_y, button="left")
+        email_x, email_y = center(locateOnScreen(email_scs, confidence=0.7))
+        click(email_x, email_y, button="left")
 
         # Clicking the Email box
-        email_box_x, email_box_y = pyautogui.center(
-            pyautogui.locateOnScreen(email_box_scs, confidence=0.7)
-        )
+        email_box_x, email_box_y = center(locateOnScreen(email_box_scs, confidence=0.7))
 
         # Delay before clicking the Email Box
-        time.sleep(msg_box_selection_delay)
+        sleep(msg_box_selection_delay)
 
-        pyautogui.click(email_box_x, email_box_y, button="left")
+        click(email_box_x, email_box_y, button="left")
 
         # Typing an Email into the box
-        pyautogui.typewrite("a@gmail.com")
+        typewrite(str(email))
 
         # Clicking Okay
-        okay_x, okay_y = pyautogui.center(
-            pyautogui.locateOnScreen(okay_scs, confidence=0.7)
-        )
-        pyautogui.click(okay_x, okay_y, button="left")
+        okay_x, okay_y = center(locateOnScreen(okay_scs, confidence=0.7))
+        click(okay_x, okay_y, button="left")
 
         # Opening Message Box
-        msg_x, msg_y = pyautogui.center(
-            pyautogui.locateOnScreen(msg_scs, confidence=0.7)
-        )
-        pyautogui.click(msg_x, msg_y, button="left")
+        msg_x, msg_y = center(locateOnScreen(msg_scs, confidence=0.7))
+        click(msg_x, msg_y, button="left")
 
         # Reloading the page
-        pyautogui.hotkey("F5")
+        hotkey("F5")
 
         # Delay for page refresh
-        time.sleep(msg_page_refresh_delay)
+        sleep(msg_page_refresh_delay)
 
         # Selecting the search template bar
-        search_x, search_y = pyautogui.center(
-            pyautogui.locateOnScreen(search_scs, confidence=0.7)
-        )
-        pyautogui.click(search_x, search_y, button="left")
+        search_x, search_y = center(locateOnScreen(search_scs, confidence=0.7))
+        click(search_x, search_y, button="left")
 
         # Searching for the specified template
-        pyautogui.typewrite(template_name)
-        pyautogui.hotkey("ctrl", "a")
-        pyautogui.hotkey("ctrl", "c")
-        pyautogui.hotkey("ctrl", "v")
+        typewrite(template_name)
+        hotkey("ctrl", "a")
+        hotkey("ctrl", "c")
+        hotkey("ctrl", "v")
 
         # Delay for template selection
-        time.sleep(template_selection_delay)
+        sleep(template_selection_delay)
 
         # Selecting the template
-        pyautogui.press("down")
+        press("down")
 
         # Template selection time delay
-        time.sleep(template_selection_delay)
+        sleep(template_selection_delay)
 
-        pyautogui.press("enter")
+        press("enter")
 
         # Pressing the send button
-        send_x, send_y = pyautogui.center(
-            pyautogui.locateOnScreen(send_scs, confidence=0.7)
-        )
-        pyautogui.click(send_x, send_y, button="left")
-
-        # Waiting for the message
-        time.sleep(screenshot_delay)
-
-        # Generate a unique filename
-        unique_filename = get_unique_filename(directory, "result")
-
-        # Taking a screenshot and saving it in the relevant directory
-        pyautogui.screenshot(unique_filename)
+        send_x, send_y = center(locateOnScreen(send_scs, confidence=0.7))
+        click(send_x, send_y, button="left")
 
         # Switching current tab
-        pyautogui.hotkey("ctrl", "tab")
+        hotkey("ctrl", "tab")
 
         # Closing current tab
         if tab_close == True:
-            pyautogui.hotkey("ctrl", "W")
+            hotkey("ctrl", "W")
 
     # Catching image not found error
-    except pyautogui.ImageNotFoundException:
-        if is_cpc():
+    except ImageNotFoundException:
+        if is_ending_page():
             handle_completion()
         if msg_show:
             handle_error()

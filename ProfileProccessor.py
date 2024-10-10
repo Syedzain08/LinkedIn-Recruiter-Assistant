@@ -1,11 +1,27 @@
-import pyautogui
-import time
-import numpy as np
-import colorsys
-import json
+#  Imports
+
+from time import sleep
+from numpy import array, logical_and, linalg
+from colorsys import rgb_to_hsv
+from json import load
+from pyautogui import (
+    position,
+    screenshot,
+    moveTo,
+    move,
+    locate,
+    ImageNotFoundException,
+    locateOnScreen,
+    click,
+    rightClick,
+    moveRel,
+    locateAllOnScreen,
+    center,
+    scroll,
+)
 
 with open("automation_settings.json", "r") as f:
-    settings = json.load(f)
+    settings = load(f)
 
 number_of_tabs = settings["numeric_settings"]["number_of_tabs"]
 delay_after_first_click_on_profile = settings["numeric_settings_page2"][
@@ -35,17 +51,15 @@ count = 0
 
 def is_purple():
     # checks if profile name is purple
-    x, y = pyautogui.position()
+    x, y = position()
     region = (int(x - 5), int(y - 5), 10, 10)  # Larger region
-    im = pyautogui.screenshot(region=region)
+    im = screenshot(region=region)
 
     # Convert image to numpy array
-    im_array = np.array(im)
+    im_array = array(im)
 
     # Convert RGB to HSV
-    hsv_array = np.array(
-        [colorsys.rgb_to_hsv(*(color / 255)) for color in im_array.reshape(-1, 3)]
-    )
+    hsv_array = array([rgb_to_hsv(*(color / 255)) for color in im_array.reshape(-1, 3)])
 
     # Define purple range in HSV
     purple_hue_range = (0.7, 0.85)  # Adjust this range as needed
@@ -53,42 +67,42 @@ def is_purple():
     value_threshold = 0.3
 
     # Check if any pixel falls within the purple range
-    purple_pixels = np.logical_and(
-        np.logical_and(
+    purple_pixels = logical_and(
+        logical_and(
             hsv_array[:, 0] >= purple_hue_range[0],
             hsv_array[:, 0] <= purple_hue_range[1],
         ),
-        np.logical_and(
+        logical_and(
             hsv_array[:, 1] >= saturation_threshold, hsv_array[:, 2] >= value_threshold
         ),
     )
 
-    purple_ratio = np.sum(purple_pixels) / len(purple_pixels)
+    purple_ratio = sum(purple_pixels) / len(purple_pixels)
     print(purple_ratio)
     return purple_ratio > purple_threshold
 
 
 def is_faded():
     # Define the target grey color in RGB
-    target_rgb = np.array([200, 200, 200])
+    target_rgb = array([200, 200, 200])
     tolerance = 30  # Allowable deviation from the target color
 
     # Get the current position of the mouse and define the region
-    x, y = pyautogui.position()
+    x, y = position()
     region = (int(x - 1), int(y - 1), 5, 5)  # Larger region
-    im = pyautogui.screenshot(region=region)
+    im = screenshot(region=region)
 
     # Convert image to numpy array
-    im_array = np.array(im)
+    im_array = array(im)
 
     # Calculate the difference between each pixel and the target grey
-    color_diff = np.linalg.norm(im_array - target_rgb, axis=2)
+    color_diff = linalg.norm(im_array - target_rgb, axis=2)
 
     # Determine if any pixel is within the tolerance range
     grey_pixels = color_diff <= tolerance
 
     # Calculate the ratio of grey pixels
-    grey_ratio = np.sum(grey_pixels) / grey_pixels.size
+    grey_ratio = sum(grey_pixels) / grey_pixels.size
     print(grey_ratio)
 
     # Define a threshold to determine if the majority of the region is grey
@@ -97,24 +111,24 @@ def is_faded():
 
 def has_been_messaged():
     # checks if a person has been messaged
-    current_pos_x, current_pos_y = pyautogui.position()
+    current_pos_x, current_pos_y = position()
     adjusted_x = current_pos_x - distance_to_msg
-    pyautogui.moveTo(adjusted_x, current_pos_y)
-    pyautogui.moveTo(adjusted_x, (current_pos_y - 1))
+    moveTo(adjusted_x, current_pos_y)
+    moveTo(adjusted_x, (current_pos_y - 1))
     if is_purple():
         return True
     else:
-        pyautogui.move(-150, 0)
-        pos_x, pos_y = pyautogui.position()
+        move(-150, 0)
+        pos_x, pos_y = position()
         search_region = (pos_x, pos_y, 900, 400)
         try:
-            pyautogui.locate(
+            locate(
                 activity_bar_scs,
-                pyautogui.screenshot(region=search_region),
+                screenshot(region=search_region),
                 confidence=0.9,
             )
             return True
-        except pyautogui.ImageNotFoundException:
+        except ImageNotFoundException:
             return False
 
 
@@ -122,19 +136,19 @@ def check_msg():
     # checks to see if a person can be messaged
     global count
     try:
-        pyautogui.locateOnScreen(inmail_credits_scs, confidence=0.9)
-        current_x, current_y = pyautogui.position()
-        pyautogui.moveTo(max(current_x - distance_to_msg, 0), current_y)
-        pyautogui.click()
-        time.sleep(delay_after_first_click_on_profile)
-        pyautogui.rightClick()
-        pyautogui.moveRel(10, 10)
-        pyautogui.click()
+        locateOnScreen(inmail_credits_scs, confidence=0.9)
+        current_x, current_y = position()
+        moveTo(max(current_x - distance_to_msg, 0), current_y)
+        click()
+        sleep(delay_after_first_click_on_profile)
+        rightClick()
+        moveRel(10, 10)
+        click()
         count += 1
-    except pyautogui.ImageNotFoundException:
-        close_button = pyautogui.locateOnScreen(close_msg_scs, confidence=0.9)
-        pyautogui.click(close_button)
-        time.sleep(delay_after_every_msg)
+    except ImageNotFoundException:
+        close_button = locateOnScreen(close_msg_scs, confidence=0.9)
+        click(close_button)
+        sleep(delay_after_every_msg)
 
 
 def process_profiles(profile_check_limit: bool, profile_limit: int):
@@ -143,22 +157,22 @@ def process_profiles(profile_check_limit: bool, profile_limit: int):
 
     global count
     try:
-        locations = list(pyautogui.locateAllOnScreen(msg_scs, confidence=0.8))
-    except pyautogui.ImageNotFoundException:
+        locations = list(locateAllOnScreen(msg_scs, confidence=0.8))
+    except ImageNotFoundException:
         handle_error()
 
     profiles_checked = 0
     for location in locations:
-        x, y = pyautogui.center(location)
-        pyautogui.moveTo(x, y)
+        x, y = center(location)
+        moveTo(x, y)
 
         if is_faded(x, y):
             profiles_checked += 1
             continue
 
         if not has_been_messaged():
-            pyautogui.click(x, y)
-            time.sleep(delay_for_msg_loading)
+            click(x, y)
+            sleep(delay_for_msg_loading)
             check_msg()
 
         profiles_checked += 1
@@ -173,10 +187,10 @@ def process_profiles(profile_check_limit: bool, profile_limit: int):
 def reached_end_of_results():
     # checks if end of page has been reached
     try:
-        pyautogui.locateOnScreen(end_of_results_scs, confidence=0.9)
+        locateOnScreen(end_of_results_scs, confidence=0.9)
         process_profiles(False, 2)
         return True
-    except pyautogui.ImageNotFoundException:
+    except ImageNotFoundException:
         return False
 
 
@@ -188,12 +202,12 @@ def main():
             if process_profiles(True, profiles_to_check):
                 print(f"Reached final count of {number_of_tabs}. Stopping.")
                 return  # Exit the function
-            pyautogui.scroll(int(scroll_amount))
-            time.sleep(delay_for_scrolling)
-        pyautogui.click(next_page_scs)
-        pos_x, pos_y = pyautogui.position()
-        pyautogui.moveTo((pos_x - 1000), pos_y)
-        time.sleep(delay_for_next_page)
+            scroll(int(scroll_amount))
+            sleep(delay_for_scrolling)
+        click(next_page_scs)
+        pos_x, pos_y = position()
+        moveTo((pos_x - 1000), pos_y)
+        sleep(delay_for_next_page)
     print(f"Total messages sent: {count}")
 
 

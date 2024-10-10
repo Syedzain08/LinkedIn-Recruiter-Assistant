@@ -1,5 +1,7 @@
+# Imports
+
 import customtkinter as ctk
-import json
+from json import load, dump
 
 
 class ScrollableFrame(ctk.CTkScrollableFrame):
@@ -27,7 +29,7 @@ class AutomationSettingsGUI:
     def load_settings(self):
         try:
             with open("automation_settings.json", "r") as f:
-                return json.load(f)
+                return load(f)
         except FileNotFoundError:
             return None
 
@@ -107,6 +109,20 @@ class AutomationSettingsGUI:
             ),
         )
 
+        self.email_label = ctk.CTkLabel(self.template_frame, text="Email:")
+        self.email_label.pack(side="left", padx=5)
+
+        self.email_entry = ctk.CTkEntry(self.template_frame, width=300)
+        self.email_entry.pack(side="left", padx=5)
+        self.email_entry.insert(
+            0,
+            (
+                self.settings.get("email_name", "Enter Your Email")
+                if self.settings
+                else "Enter Your Email"
+            ),
+        )
+
         # Numeric inputs
         self.num_frame = ctk.CTkFrame(self.scrollable_frame)
         self.num_frame.pack(pady=10, padx=10, fill="x")
@@ -159,13 +175,6 @@ class AutomationSettingsGUI:
                     str(self.settings["numeric_settings"]["template_selection_delay"])
                     if self.settings and "numeric_settings" in self.settings
                     else "0.4"
-                )
-            ),
-            "screenshot_delay": ctk.StringVar(
-                value=(
-                    str(self.settings["numeric_settings"]["screenshot_delay"])
-                    if self.settings and "numeric_settings" in self.settings
-                    else "3"
                 )
             ),
         }
@@ -322,6 +331,7 @@ class AutomationSettingsGUI:
         settings = {
             "screenshot_directory": self.dir_entry.get(),
             "template_name": self.template_entry.get(),
+            "email_name": self.template_entry.get(),
             "boolean_settings": {k: v.get() for k, v in self.bool_vars.items()},
             "numeric_settings": {k: float(v.get()) for k, v in self.num_vars.items()},
             "numeric_settings_page2": {
@@ -331,7 +341,7 @@ class AutomationSettingsGUI:
         }
 
         with open("automation_settings.json", "w") as f:
-            json.dump(settings, f, indent=4)
+            dump(settings, f, indent=4)
 
         self.root.destroy()
 

@@ -1,6 +1,7 @@
 {
-    "screenshot_directory": "C:/Users/HP Notebook/Pictures/Screenshots",
+    "screenshot_directory": "C:/Users/Zain/Pictures/Screenshots",
     "template_name": "Quality Engineer",
+    "email_name": "Quality Engineer",
     "boolean_settings": {
         "msg_show": true,
         "tab_close": false,
@@ -13,8 +14,7 @@
         "main_page_refresh_delay": 0.0,
         "msg_page_refresh_delay": 6.0,
         "msg_box_selection_delay": 0.0,
-        "template_selection_delay": 0.3,
-        "screenshot_delay": 3.0
+        "template_selection_delay": 0.3
     },
     "numeric_settings_page2": {
         "scroll_amount": -400.0,

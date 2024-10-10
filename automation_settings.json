@@ -1,7 +1,7 @@
 {
     "screenshot_directory": "C:/Users/Zain/Pictures/Screenshots",
     "template_name": "Quality Engineer",
-    "email_name": "Quality Engineer",
+    "email_name": "",
     "boolean_settings": {
         "msg_show": true,
         "tab_close": false,

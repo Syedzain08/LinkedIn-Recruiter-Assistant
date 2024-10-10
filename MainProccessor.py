@@ -67,7 +67,7 @@ okay_scs = "./Screenshots/okay.png"
 msg_scs = "./Screenshots/msg.png"
 search_scs = "./Screenshots/search.png"
 send_scs = "./Screenshots/send.png"
-cpc_page_scs = "./Screenshots/cpc-page.png"
+ending_page_scs = "./Screenshots/ending-page.png"
 search_page_scs = "./Screenshots/search-page.png"
 
 
@@ -221,7 +221,7 @@ def is_search_page():
 
 def is_ending_page():
     try:
-        locateOnScreen(cpc_page_scs)
+        locateOnScreen(ending_page_scs)
         return True
     except ImageNotFoundException:
         return False

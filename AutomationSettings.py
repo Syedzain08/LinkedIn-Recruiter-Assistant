@@ -331,7 +331,7 @@ class AutomationSettingsGUI:
         settings = {
             "screenshot_directory": self.dir_entry.get(),
             "template_name": self.template_entry.get(),
-            "email_name": self.template_entry.get(),
+            "email_name": self.email_entry.get(),
             "boolean_settings": {k: v.get() for k, v in self.bool_vars.items()},
             "numeric_settings": {k: float(v.get()) for k, v in self.num_vars.items()},
             "numeric_settings_page2": {

@@ -1,0 +1,31 @@
+Copyright 2024 Syed Zain Ul Abideen
+
+Version 1.0
+
+Permissions:
+1. Use: You are permitted to use this software for personal, educational, or non-commercial purposes only.
+2. Modification: You are allowed to modify the source code for personal or non-commercial purposes, provided the conditions outlined in this license are followed.
+3. Redistribution: You may redistribute the original or modified source code, provided the following conditions are met:
+   - Redistribution must be non-commercial (no sale or monetary gain).
+   - Proper credit must be given to the original author (Syed Zain Ul Abideen).
+   - A copy of this license must be included with any distribution or derivative work.
+
+Restrictions:
+1. No Commercial Use: This software and any derivative works based on it may not be sold, distributed for profit, or used for commercial purposes without explicit written permission from the original author (Syed Zain Ul Abideen).
+2. Attribution: Any redistribution or modification of this software must include clear attribution to the original author (Syed Zain Ul Abideen) and a link to the original source.
+3. No Endorsement: The name of the author or contributors may not be used to endorse or promote products derived from this software without prior written permission.
+
+Disclaimer of Warranty:
+THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+Additional Terms:
+1. License Versioning: Any updated versions of this license will apply to future releases of the software. Older versions will continue to be governed by the original license terms.
+
+Conclusion:
+By using, modifying, or distributing this software, you agree to the terms outlined in this license. If you have any questions or need to request permission for commercial use, please contact Syed Zain Ul Abideen at "goodtingbye2@gmail.com".
+
+---
+
+Syed Zain Ul Abideen
+
+Date: 19/10/2024

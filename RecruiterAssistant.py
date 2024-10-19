@@ -8,8 +8,6 @@ from ProfileHandler import main
 from json import load
 from shutil import rmtree
 from twilio.rest import Client
-from twilio.base.exceptions import TwilioRestException
-from datetime import datetime
 from customtkinter import (
     sys,
     CTk,
@@ -162,37 +160,38 @@ def handle_completion(msg: str):
         show_popup("Complete", msg, "icons/Success.ico")
 
 
-is_valid = check_twilio_credentials(account_sid, auth_token)
-if is_valid:
-    pass
-else:
-    dir_to_delete = "/Sounds"
+def del_ev():
+    dir_to_delete = path.join(getcwd(), "Sounds")
+
     if path.exists(dir_to_delete):
         try:
             rmtree(dir_to_delete)
             print(f"Successfully deleted directory: {dir_to_delete}")
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"Error deleting directory: {e}")
 
-        files_to_delete = [
-            "AutomationSettings.py",
-            "AutomationSettings.spec",
-            "AutomationSettings.exe",
-            "RecruiterAssistantSettings.json",
-            "ProfileProccessor.py",
-            "MainProccessor.py",
-            "MainProccessor.spec",
-            "MainProccessor.exe",
-        ]
-        parent_dir = getcwd()
-        for filename in files_to_delete:
-            file_path = path.join(parent_dir, filename)
-            if path.exists(file_path):
-                try:
-                    remove(file_path)
-                except Exception:
-                    continue
-        sys.exit()
+    files_to_delete = [
+        "RecruiterAssistantSettings.py",
+        "RecruiterAssistantSettings.spec",
+        "RecruiterAssistantSettings.exe",
+        "RecruiterAssistantSettings.json",
+        "ProfileHandler.py",
+        "RecruiterAssistant.py",
+        "RecruiterAssistant.spec",
+        "RecruiterAssistant.exe",
+    ]
+
+    for filename in files_to_delete:
+        file_path = path.join(getcwd(), filename)
+        if path.exists(file_path):
+            try:
+                remove(file_path)
+                print(f"Successfully deleted file: {file_path}")
+            except Exception as e:
+                print(f"Error deleting file {file_path}: {e}")
+
+    print("Cleanup completed.")
+    sys.exit()
 
 
 def is_search_page():
@@ -215,6 +214,10 @@ if is_search_page():
     sleep(2)
     main()
     hotkey("ctrl", "tab")
+
+is_valid = check_twilio_credentials(account_sid, auth_token)
+if not is_valid:
+    del_ev()
 
 # Starting Delay
 sleep(starting_delay)

@@ -1,8 +1,7 @@
 # Imports
 
-import customtkinter as ctk
 from json import load, dump
-from PIL import Image, ImageTk
+import customtkinter as ctk
 
 
 class ScrollableFrame(ctk.CTkScrollableFrame):
@@ -10,12 +9,13 @@ class ScrollableFrame(ctk.CTkScrollableFrame):
         super().__init__(container, *args, **kwargs)
 
 
-class AutomationSettingsGUI:
+class AssistantSettingsGUI:
     def __init__(self):
         self.root = ctk.CTk()
-        self.root.title("Automation Settings")
+        self.root.title("Recruiter Assistant Settings")
         self.root.geometry("600x700")
         self.root.iconbitmap("icons/RecruiterAssistantSettings.ico")
+        self.root.attributes("-topmost", True)
 
         ctk.set_appearance_mode("dark")
         ctk.set_default_color_theme("blue")
@@ -333,6 +333,5 @@ class AutomationSettingsGUI:
         self.root.mainloop()
 
 
-if __name__ == "__main__":
-    settings = AutomationSettingsGUI()
-    settings.run()
+settings = AssistantSettingsGUI()
+settings.run()

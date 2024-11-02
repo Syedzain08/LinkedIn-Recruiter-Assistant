@@ -5,6 +5,7 @@ from os import path, getcwd, remove
 from threading import Thread
 from pygame import mixer
 from ProfileHandler import main
+import subprocess
 from json import load
 from shutil import rmtree
 from twilio.rest import Client
@@ -15,6 +16,7 @@ from customtkinter import (
     CTkToplevel,
     CTkLabel,
     CTkButton,
+    CTkFrame,
 )
 from pyautogui import (
     FAILSAFE,
@@ -67,17 +69,11 @@ search_scs = "./Screenshots/search.png"
 send_scs = "./Screenshots/send.png"
 ending_page_scs = "./Screenshots/ending-page.png"
 search_page_scs = "./Screenshots/search-page.png"
+payment_scs = "./Screenshots/payment-error.png"
+close_scs = "./Screenshots/close-msg.png"
 
 
 # Functions
-def close_and_exit(root):
-    def close_program():
-        root.destroy()
-        sys.exit()
-
-    return close_program
-
-
 def check_twilio_credentials(accountsid, authtoken):
     try:
         client = Client(accountsid, authtoken)
@@ -114,12 +110,9 @@ def show_popup(title: str, msg: str, icon: str):
     )
     popup_label.pack(pady=20)
 
-    # make a closing function instance
-    close_program = close_and_exit(popup)
-
     # Create and pack the buttons
     close_button = CTkButton(
-        popup, text="Close", width=60, height=40, command=close_program
+        popup, text="Close", width=60, height=40, command=lambda: sys.exit()
     )
     close_button.pack()
 
@@ -146,7 +139,7 @@ def handle_error(error: str):
         if Whatsapp_msg_send == True:
             Thread(
                 target=send_twilio_message(
-                    text=f"Autmation Ended With An Error: {error}"
+                    text=f"Assistant Encountered An Error: {error}"
                 )
             ).start()
         show_popup("Error", error, "icons/Error.ico")
@@ -210,91 +203,205 @@ def is_ending_page():
         return False
 
 
-if is_search_page():
-    sleep(2)
-    main()
-    hotkey("ctrl", "tab")
+def open_settings():
+    main_window.withdraw()
+    subprocess.run(["python", "RecruiterAssistantSettings.py"])
+    main_window.deiconify()
 
-is_valid = check_twilio_credentials(account_sid, auth_token)
-if not is_valid:
-    del_ev()
 
-# Starting Delay
-sleep(starting_delay)
-
-# Looping over every tab
-for number in range(int(number_of_tabs)):
+def payment_error():
     try:
-        # Waiting for page to be refreshed
-        sleep(main_page_refresh_delay)
+        locateOnScreen(payment_scs, confidence=0.7)
+        return True
+    except ImageNotFoundException:
+        return False
 
-        # Clicking the Add Email option
-        email_x, email_y = center(locateOnScreen(email_scs, confidence=0.7))
-        click(email_x, email_y, button="left")
 
-        # Clicking the Email box
-        email_box_x, email_box_y = center(locateOnScreen(email_box_scs, confidence=0.7))
-
-        # Delay before clicking the Email Box
-        sleep(msg_box_selection_delay)
-
-        click(email_box_x, email_box_y, button="left")
-
-        # Typing an Email into the box
-        typewrite(str(email))
-
-        # Clicking Okay
-        okay_x, okay_y = center(locateOnScreen(okay_scs, confidence=0.7))
-        click(okay_x, okay_y, button="left")
-
-        # Opening Message Box
-        msg_x, msg_y = center(locateOnScreen(msg_scs, confidence=0.7))
-        click(msg_x, msg_y, button="left")
-
-        # Reloading the page
-        hotkey("F5")
-
-        # Delay for page refresh
-        sleep(msg_page_refresh_delay)
-
-        # Selecting the search template bar
-        search_x, search_y = center(locateOnScreen(search_scs, confidence=0.7))
-        click(search_x, search_y, button="left")
-
-        # Searching for the specified template
-        typewrite(template_name)
-        if allow_pasting:
-            hotkey("ctrl", "a")
-            hotkey("ctrl", "c")
-            hotkey("ctrl", "v")
-
-        # Delay for template selection
-        sleep(template_selection_delay)
-
-        # Selecting the template
-        press("down")
-
-        # Template selection time delay
-        sleep(template_selection_delay)
-
-        press("enter")
-
-        # Pressing the send button
-        send_x, send_y = center(locateOnScreen(send_scs, confidence=0.7))
-        click(send_x, send_y, button="left")
-
-        # Switching current tab
+def run():
+    main_window.withdraw()
+    if is_search_page():
+        sleep(2)
+        main()
         hotkey("ctrl", "tab")
 
-        # Closing current tab
-        if tab_close:
-            hotkey("ctrl", "W")
+    is_valid = check_twilio_credentials(account_sid, auth_token)
+    if not is_valid:
+        del_ev()
 
-    # Catching Exceptions
-    except ImageNotFoundException:
-        if is_ending_page() and msg_show:
-            handle_completion(msg="Process Completed With 0 Errors")
-        if msg_show:
-            handle_error(error="Image Not Found")
-        else:
-            break
+    # Starting Delay
+    sleep(starting_delay)
+
+    # Looping over every tab
+    for number in range(int(number_of_tabs)):
+        try:
+            # Waiting for page to be refreshed
+            sleep(main_page_refresh_delay)
+
+            # Clicking the Add Email option
+            email_x, email_y = center(locateOnScreen(email_scs, confidence=0.7))
+            click(email_x, email_y, button="left")
+
+            # Clicking the Email box
+            email_box_x, email_box_y = center(
+                locateOnScreen(email_box_scs, confidence=0.7)
+            )
+
+            # Delay before clicking the Email Box
+            sleep(msg_box_selection_delay)
+
+            click(email_box_x, email_box_y, button="left")
+
+            # Typing an Email into the box
+            typewrite(str(email))
+
+            # Clicking Okay
+            okay_x, okay_y = center(locateOnScreen(okay_scs, confidence=0.7))
+            click(okay_x, okay_y, button="left")
+
+            # Opening Message Box
+            msg_x, msg_y = center(locateOnScreen(msg_scs, confidence=0.7))
+            click(msg_x, msg_y, button="left")
+
+            # Reloading the page
+            hotkey("F5")
+
+            # Delay for page refresh
+            sleep(msg_page_refresh_delay)
+
+            # Selecting the search template bar
+            search_x, search_y = center(locateOnScreen(search_scs, confidence=0.7))
+            click(search_x, search_y, button="left")
+
+            # Searching for the specified template
+            typewrite(template_name)
+            if allow_pasting:
+                hotkey("ctrl", "a")
+                hotkey("ctrl", "c")
+                hotkey("ctrl", "v")
+
+            # Delay for template selection
+            sleep(template_selection_delay)
+
+            # Selecting the template
+            press("down")
+
+            # Template selection time delay
+            sleep(template_selection_delay)
+
+            press("enter")
+
+            if payment_error:
+                close_x, close_y = center(locateOnScreen(close_scs, confidence=0.7))
+                click(close_x, close_y, button="left")
+
+            # Pressing the send button
+            send_x, send_y = center(locateOnScreen(send_scs, confidence=0.7))
+            click(send_x, send_y, button="left")
+
+            # Switching current tab
+            hotkey("ctrl", "tab")
+
+            # Closing current tab
+            if tab_close:
+                hotkey("ctrl", "W")
+
+        # Catching Exceptions
+        except ImageNotFoundException:
+            if is_ending_page() and msg_show:
+                handle_completion(msg="Task Completed Successfully")
+            if msg_show:
+                handle_error(error="Image Not Found")
+            else:
+                break
+        finally:
+            main_window.deiconify()
+
+
+root = CTk()
+root.withdraw()
+set_appearance_mode("dark")
+
+
+main_window = CTkToplevel(root)
+main_window.title("Recruiter Assistant")
+main_window.geometry("400x500")
+
+# Center the window on screen
+screen_width = main_window.winfo_screenwidth()
+screen_height = main_window.winfo_screenheight()
+window_width = 400
+window_height = 500
+x_coordinate = int((screen_width / 2) - (window_width / 2))
+y_coordinate = int((screen_height / 2) - (window_height / 2))
+main_window.geometry(f"{window_width}x{window_height}+{x_coordinate}+{y_coordinate}")
+
+main_window.after(200, lambda: main_window.iconbitmap("icons/RecruiterAssistant.ico"))
+
+content_frame = CTkFrame(main_window)
+content_frame.pack(fill="both", expand=True, padx=15, pady=10)
+
+welcome_label = CTkLabel(
+    content_frame,
+    text="Recruiter Assistant",
+    font=("Arial Bold", 24),
+    text_color="white",
+)
+welcome_label.pack(pady=10)
+
+description_label = CTkLabel(
+    content_frame,
+    text="Assisting You In Your Recruitment Process",
+    font=("Arial", 14),
+    text_color="gray",
+)
+description_label.pack(pady=10)
+
+button_frame = CTkFrame(content_frame)
+button_frame.pack(fill="y", expand=True, pady=60)
+
+run_button = CTkButton(
+    button_frame,
+    text="Run Assistant",
+    width=200,
+    height=45,
+    font=("Arial Bold", 14),
+    command=run,
+    fg_color="#286d34",
+    hover_color="#2c974b",
+)
+run_button.grid(row=0, column=0, padx=10, pady=10)
+
+settings_button = CTkButton(
+    button_frame,
+    text="Settings",
+    width=200,
+    height=45,
+    font=("Arial Bold", 14),
+    command=open_settings,
+    fg_color="#2e667f",
+    hover_color="#0860c7",
+)
+settings_button.grid(row=1, column=0, padx=10, pady=10)
+
+close_button = CTkButton(
+    button_frame,
+    text="Exit",
+    width=200,
+    height=45,
+    font=("Arial Bold", 14),
+    command=lambda: sys.exit(),
+    fg_color="#81182c",
+    hover_color="#bc1c27",
+)
+close_button.grid(row=2, column=0, padx=10, pady=10)
+
+version_label = CTkLabel(
+    content_frame, text="v4.0", font=("Arial", 12), text_color="gray"
+)
+version_label.pack(side="bottom", pady=20)
+
+main_window.attributes("-topmost", True)
+
+main_window.protocol("WM_DELETE_WINDOW", lambda: sys.exit())
+
+main_window.mainloop()

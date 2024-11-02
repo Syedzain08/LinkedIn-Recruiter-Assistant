@@ -30,8 +30,8 @@
     },
     "twilio_settings": {
         "account_sid": "ACa01ad346b90457c0c107fefe8f0d91fb",
-        "auth_token": "4c7c2f2758c6f627cda48a65aea55cde",
+        "auth_token": "N/A",
         "twilio_default_number": "+14155238886",
-        "user_phone_number": "+923056117017"
+        "user_phone_number": "N/A"
     }
 }

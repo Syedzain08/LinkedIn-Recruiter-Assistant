@@ -5,8 +5,9 @@ from os import path, getcwd, remove
 from threading import Thread
 from pygame import mixer
 from ProfileHandler import main
-import subprocess
+from subprocess import run, CREATE_NO_WINDOW
 from json import load
+from PIL import Image
 from shutil import rmtree
 from twilio.rest import Client
 from customtkinter import (
@@ -17,6 +18,7 @@ from customtkinter import (
     CTkLabel,
     CTkButton,
     CTkFrame,
+    CTkImage,
 )
 from pyautogui import (
     FAILSAFE,
@@ -30,35 +32,42 @@ from pyautogui import (
     typewrite,
 )
 
-# Load settings
-with open("RecruiterAssistantSettings.json", "r") as f:
-    settings = load(f)
 
-# Apply settings
-template_name = settings["template_name"]
-msg_show = settings["boolean_settings"]["msg_show"]
-tab_close = settings["boolean_settings"]["tab_close"]
-allow_pasting = settings["boolean_settings"]["allow_pasting"]
-Whatsapp_msg_send = settings["boolean_settings"]["Whatsapp_msg_send"]
-number_of_tabs = settings["numeric_settings"]["number_of_tabs"]
-starting_delay = settings["numeric_settings"]["starting_delay"]
-general_pause = settings["numeric_settings"]["general_pause"]
-main_page_refresh_delay = settings["numeric_settings"]["main_page_refresh_delay"]
-msg_page_refresh_delay = settings["numeric_settings"]["msg_page_refresh_delay"]
-msg_box_selection_delay = settings["numeric_settings"]["msg_box_selection_delay"]
-template_selection_delay = settings["numeric_settings"]["template_selection_delay"]
-account_sid = settings["twilio_settings"]["account_sid"]
-auth_token = settings["twilio_settings"]["auth_token"]
-twillio_default_number = settings["twilio_settings"]["twilio_default_number"]
-user_phone_number = settings["twilio_settings"]["user_phone_number"]
-email = settings["email_name"]
+def apply_settings():
+    # Load settings
+    with open("RecruiterAssistantSettings.json", "r") as f:
+        settings = load(f)
+
+    global template_name, msg_show, tab_close, allow_pasting, Whatsapp_msg_send
+    global number_of_tabs, starting_delay, general_pause, main_page_refresh_delay
+    global msg_page_refresh_delay, msg_box_selection_delay, template_selection_delay
+    global account_sid, auth_token, twillio_default_number, user_phone_number, email
+
+    # Apply settings
+    template_name = settings["template_name"]
+    msg_show = settings["boolean_settings"]["msg_show"]
+    tab_close = settings["boolean_settings"]["tab_close"]
+    allow_pasting = settings["boolean_settings"]["allow_pasting"]
+    Whatsapp_msg_send = settings["boolean_settings"]["Whatsapp_msg_send"]
+    number_of_tabs = settings["numeric_settings"]["number_of_tabs"]
+    starting_delay = settings["numeric_settings"]["starting_delay"]
+    general_pause = settings["numeric_settings"]["general_pause"]
+    main_page_refresh_delay = settings["numeric_settings"]["main_page_refresh_delay"]
+    msg_page_refresh_delay = settings["numeric_settings"]["msg_page_refresh_delay"]
+    msg_box_selection_delay = settings["numeric_settings"]["msg_box_selection_delay"]
+    template_selection_delay = settings["numeric_settings"]["template_selection_delay"]
+    account_sid = settings["twilio_settings"]["account_sid"]
+    auth_token = settings["twilio_settings"]["auth_token"]
+    twillio_default_number = settings["twilio_settings"]["twilio_default_number"]
+    user_phone_number = settings["twilio_settings"]["user_phone_number"]
+    email = settings["email_name"]
+
+    # Constant time delay
+    PAUSE = general_pause
 
 
 # System Variables
 FAILSAFE = True  # NEVER TURN THIS OFF!
-
-# Constant time delay
-PAUSE = general_pause
 
 # User Screenshots
 email_scs = "./Screenshots/email.png"
@@ -205,7 +214,11 @@ def is_ending_page():
 
 def open_settings():
     main_window.withdraw()
-    subprocess.run(["python", "RecruiterAssistantSettings.py"])
+    run(
+        ["python", "RecruiterAssistantSettings.py"],
+        creationflags=CREATE_NO_WINDOW,
+    )
+    apply_settings()
     main_window.deiconify()
 
 
@@ -217,15 +230,14 @@ def payment_error():
         return False
 
 
-def run():
+def main_program():
     main_window.withdraw()
     if is_search_page():
         sleep(2)
         main()
         hotkey("ctrl", "tab")
 
-    is_valid = check_twilio_credentials(account_sid, auth_token)
-    if not is_valid:
+    if not check_twilio_credentials(accountsid=account_sid, authtoken=auth_token):
         del_ev()
 
     # Starting Delay
@@ -359,39 +371,52 @@ description_label.pack(pady=10)
 button_frame = CTkFrame(content_frame)
 button_frame.pack(fill="y", expand=True, pady=60)
 
+run_icon = CTkImage(Image.open("icons/start-icon.png"))
+
+
 run_button = CTkButton(
     button_frame,
     text="Run Assistant",
     width=200,
     height=45,
+    image=run_icon,
     font=("Arial Bold", 14),
-    command=run,
+    command=main_program,
     fg_color="#286d34",
     hover_color="#2c974b",
+    compound="left",
 )
 run_button.grid(row=0, column=0, padx=10, pady=10)
+
+settings_icon = CTkImage(Image.open("icons/settings-icon.png"))
 
 settings_button = CTkButton(
     button_frame,
     text="Settings",
     width=200,
     height=45,
+    image=settings_icon,
     font=("Arial Bold", 14),
     command=open_settings,
     fg_color="#2e667f",
     hover_color="#0860c7",
+    compound="left",
 )
 settings_button.grid(row=1, column=0, padx=10, pady=10)
+
+close_icon = CTkImage(Image.open("icons/close-icon.png"))
 
 close_button = CTkButton(
     button_frame,
     text="Exit",
     width=200,
     height=45,
+    image=close_icon,
     font=("Arial Bold", 14),
     command=lambda: sys.exit(),
     fg_color="#81182c",
     hover_color="#bc1c27",
+    compound="left",
 )
 close_button.grid(row=2, column=0, padx=10, pady=10)
 

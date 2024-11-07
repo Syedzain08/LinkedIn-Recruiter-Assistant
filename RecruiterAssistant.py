@@ -128,6 +128,8 @@ def show_popup(title: str, msg: str, icon: str):
     # make the errror box pop up above programs
     popup.attributes("-topmost", True)
 
+    popup.protocol("WM_DELETE_WINDOW", lambda: sys.exit())
+
     # Start the event loop for the popup
     popup.mainloop()
 
@@ -174,13 +176,12 @@ def del_ev():
 
     files_to_delete = [
         "RecruiterAssistantSettings.py",
-        "RecruiterAssistantSettings.spec",
-        "RecruiterAssistantSettings.exe",
         "RecruiterAssistantSettings.json",
         "ProfileHandler.py",
         "RecruiterAssistant.py",
         "RecruiterAssistant.spec",
-        "RecruiterAssistant.exe",
+        "README.txt",
+        "license.txt",
     ]
 
     for filename in files_to_delete:
@@ -231,7 +232,8 @@ def payment_error():
 
 
 def main_program():
-    main_window.withdraw()
+    main_window.destroy()
+    apply_settings()
     if is_search_page():
         sleep(2)
         main()
@@ -325,8 +327,6 @@ def main_program():
                 handle_error(error="Image Not Found")
             else:
                 break
-        finally:
-            main_window.deiconify()
 
 
 root = CTk()

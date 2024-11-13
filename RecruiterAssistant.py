@@ -6,7 +6,7 @@ from threading import Thread
 from pygame import mixer
 from ProfileHandler import main
 from subprocess import run, CREATE_NO_WINDOW
-from json import load
+from json import load, dump
 from PIL import Image
 from shutil import rmtree
 from twilio.rest import Client
@@ -38,15 +38,14 @@ def apply_settings():
     with open("RecruiterAssistantSettings.json", "r") as f:
         settings = load(f)
 
-    global template_name, msg_show, tab_close, allow_pasting, Whatsapp_msg_send
+    global template_name, msg_show, allow_pasting, Whatsapp_msg_send
     global number_of_tabs, starting_delay, general_pause, main_page_refresh_delay
     global msg_page_refresh_delay, msg_box_selection_delay, template_selection_delay
-    global account_sid, auth_token, twillio_default_number, user_phone_number, email
+    global account_sid, auth_token, twillio_default_number, user_phone_number, email, total_msg_sent
 
     # Apply settings
     template_name = settings["template_name"]
     msg_show = settings["boolean_settings"]["msg_show"]
-    tab_close = settings["boolean_settings"]["tab_close"]
     allow_pasting = settings["boolean_settings"]["allow_pasting"]
     Whatsapp_msg_send = settings["boolean_settings"]["Whatsapp_msg_send"]
     number_of_tabs = settings["numeric_settings"]["number_of_tabs"]
@@ -61,6 +60,7 @@ def apply_settings():
     twillio_default_number = settings["twilio_settings"]["twilio_default_number"]
     user_phone_number = settings["twilio_settings"]["user_phone_number"]
     email = settings["email_name"]
+    total_msg_sent = settings["total_msg_sent"]
 
     # Constant time delay
     PAUSE = general_pause
@@ -68,6 +68,7 @@ def apply_settings():
 
 # System Variables
 FAILSAFE = True  # NEVER TURN THIS OFF!
+messages_sent = 0
 
 # User Screenshots
 email_scs = "./Screenshots/email.png"
@@ -93,6 +94,24 @@ def check_twilio_credentials(accountsid, authtoken):
         return False
 
 
+def update_msg_count():
+    global total_msg_sent
+    global messages_sent
+
+    total_msg_sent += messages_sent
+
+    with open("RecruiterAssistantSettings.json", "r") as f:
+        data = load(f)
+
+    if "total_msg_sent" in data:
+        data["total_msg_sent"] += total_msg_sent
+    else:
+        data["total_msg_sent"] = total_msg_sent
+
+    with open("RecruiterAssistantSettings.json", "w") as file:
+        dump(data, file, indent=4)
+
+
 def play_sound(sound: str, dir: str, repeat: int):
     # Function for a playing sound a set amount of times
     for _ in range(repeat):
@@ -109,21 +128,40 @@ def show_popup(title: str, msg: str, icon: str):
 
     # Create the Toplevel window
     popup = CTkToplevel(show_popup.root)
-    popup.geometry("300x150+1000+300")
+    popup.geometry("300x180+1100+400")
     popup.title(title)
     popup.after(200, lambda: popup.iconbitmap(icon))
 
     # Create and pack the error label
     popup_label = CTkLabel(
-        popup, text=msg, font=("Arial", 12), height=30, width=30, text_color="white"
+        popup, text=msg, font=("Aria Bold", 12), height=30, width=30, text_color="white"
     )
-    popup_label.pack(pady=20)
+    popup_label.pack(pady=10)
 
+    message_count_label = CTkLabel(
+        popup,
+        text=f"Messages Sent Before : {messages_sent}",
+        font=("Aria Bold", 12),
+        height=30,
+        width=30,
+        text_color="white",
+    )
+    message_count_label.pack()
+
+    total_message_count_label = CTkLabel(
+        popup,
+        text=f"Total Messages: {total_msg_sent}",
+        font=("Aria Bold", 12),
+        height=30,
+        width=30,
+        text_color="white",
+    )
+    total_message_count_label.pack()
     # Create and pack the buttons
     close_button = CTkButton(
         popup, text="Close", width=60, height=40, command=lambda: sys.exit()
     )
-    close_button.pack()
+    close_button.pack(pady=5)
 
     # make the errror box pop up above programs
     popup.attributes("-topmost", True)
@@ -150,7 +188,7 @@ def handle_error(error: str):
         if Whatsapp_msg_send == True:
             Thread(
                 target=send_twilio_message(
-                    text=f"Assistant Encountered An Error: {error}"
+                    text=f"Assistant Encountered An Error: {error} \n Messages Sent: {messages_sent} \n Total Messages: {total_msg_sent}"
                 )
             ).start()
         show_popup("Error", error, "icons/Error.ico")
@@ -232,6 +270,7 @@ def payment_error():
 
 
 def main_program():
+    global messages_sent
     main_window.destroy()
     apply_settings()
     if is_search_page():
@@ -255,15 +294,8 @@ def main_program():
             email_x, email_y = center(locateOnScreen(email_scs, confidence=0.7))
             click(email_x, email_y, button="left")
 
-            # Clicking the Email box
-            email_box_x, email_box_y = center(
-                locateOnScreen(email_box_scs, confidence=0.7)
-            )
-
-            # Delay before clicking the Email Box
+            # Delay before typing in the Email Box
             sleep(msg_box_selection_delay)
-
-            click(email_box_x, email_box_y, button="left")
 
             # Typing an Email into the box
             typewrite(str(email))
@@ -311,18 +343,18 @@ def main_program():
             # Pressing the send button
             send_x, send_y = center(locateOnScreen(send_scs, confidence=0.7))
             click(send_x, send_y, button="left")
+            messages_sent += 1
+            update_msg_count()
 
             # Switching current tab
             hotkey("ctrl", "tab")
 
-            # Closing current tab
-            if tab_close:
-                hotkey("ctrl", "W")
-
         # Catching Exceptions
         except ImageNotFoundException:
             if is_ending_page() and msg_show:
-                handle_completion(msg="Task Completed Successfully")
+                handle_completion(
+                    msg=f"Task Completed Successfully \n Messages Sent: {messages_sent} \n Total Messages: {total_msg_sent}"
+                )
             if msg_show:
                 handle_error(error="Image Not Found")
             else:
@@ -421,7 +453,7 @@ close_button = CTkButton(
 close_button.grid(row=2, column=0, padx=10, pady=10)
 
 version_label = CTkLabel(
-    content_frame, text="v4.0", font=("Arial", 12), text_color="gray"
+    content_frame, text="v4.1.1.1", font=("Arial", 12), text_color="gray"
 )
 version_label.pack(side="bottom", pady=20)
 

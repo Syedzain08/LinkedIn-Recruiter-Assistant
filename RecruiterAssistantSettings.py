@@ -1,5 +1,6 @@
 # Imports
 
+from sys import exit
 from json import load, dump
 import customtkinter as ctk
 
@@ -26,11 +27,28 @@ class AssistantSettingsGUI:
         self.scrollable_frame = ScrollableFrame(self.root)
         self.scrollable_frame.pack(fill="both", expand=True)
 
+        self.total_message_label = ctk.CTkLabel(
+            self.scrollable_frame,
+            text=f'Total Messages Sent {self.settings["total_msg_sent"]}',
+            font=("Aria Bold", 14),
+        )
+
+        self.total_message_label.pack(pady=10)
+
         # Add save button at the top
         self.top_save_button = ctk.CTkButton(
-            self.scrollable_frame, text="Save Settings", command=self.save_settings
+            self.scrollable_frame,
+            text="Save Settings",
+            command=self.save_settings,
         )
         self.top_save_button.pack(pady=10)
+
+        self.reset_msg_count_button = ctk.CTkButton(
+            self.scrollable_frame,
+            text="Reset Message Count",
+            command=self.reset_msg_count,
+        )
+        self.reset_msg_count_button.pack(pady=10)
 
         self.create_widgets()
 
@@ -40,6 +58,36 @@ class AssistantSettingsGUI:
                 return load(f)
         except FileNotFoundError:
             return None
+
+    def browse_directory(self):
+        directory = ctk.filedialog.askdirectory()
+        if directory:
+            self.dir_entry.delete(0, ctk.END)
+            self.dir_entry.insert(0, directory)
+
+    def update_total_message_label(self):
+        # Update the label with the current total_msg_sent
+        self.total_message_label.configure(
+            text=f'Total Messages Sent: {self.settings["total_msg_sent"]}'
+        )
+
+    def reset_msg_count(self):
+        # Open the file and load its current contents
+        with open("RecruiterAssistantSettings.json", "r") as f:
+            data = load(f)
+
+        # Reset the total_msg_sent to 0
+        data["total_msg_sent"] = 0
+
+        # Write the updated data back to the file
+        with open("RecruiterAssistantSettings.json", "w") as file:
+            dump(data, file, indent=4)
+
+        # Update the settings dictionary to reflect the change
+        self.settings["total_msg_sent"] = 0
+
+        # Update the label to reflect the new value
+        self.update_total_message_label()
 
     def create_widgets(self):
 
@@ -51,13 +99,6 @@ class AssistantSettingsGUI:
             "msg_show": ctk.BooleanVar(
                 value=(
                     self.settings["boolean_settings"]["msg_show"]
-                    if self.settings and "boolean_settings" in self.settings
-                    else False
-                )
-            ),
-            "tab_close": ctk.BooleanVar(
-                value=(
-                    self.settings["boolean_settings"]["tab_close"]
                     if self.settings and "boolean_settings" in self.settings
                     else False
                 )
@@ -313,21 +354,35 @@ class AssistantSettingsGUI:
         self.save_button.pack(pady=20)
 
     def save_settings(self):
-        settings = {
-            "template_name": self.template_entry.get(),
-            "email_name": self.email_entry.get(),
-            "boolean_settings": {k: v.get() for k, v in self.bool_vars.items()},
-            "numeric_settings": {k: float(v.get()) for k, v in self.num_vars.items()},
-            "numeric_settings_page2": {
-                k: float(v.get()) for k, v in self.num_vars2.items()
-            },
-            "twilio_settings": {k: v.get() for k, v in self.twilio_vars.items()},
-        }
+        # Load current settings and ensure mutability
+        try:
+            with open("RecruiterAssistantSettings.json", "r") as f:
+                settings = load(f)
+        except FileNotFoundError:
+            settings = {}
+        settings.update(
+            {
+                "template_name": self.template_entry.get(),
+                "email_name": self.email_entry.get(),
+                "boolean_settings": {k: v.get() for k, v in self.bool_vars.items()},
+                "numeric_settings": {
+                    k: float(v.get()) for k, v in self.num_vars.items()
+                },
+                "numeric_settings_page2": {
+                    k: float(v.get()) for k, v in self.num_vars2.items()
+                },
+                "twilio_settings": {k: v.get() for k, v in self.twilio_vars.items()},
+            }
+        )
 
+        # Save the updated settings back to the JSON file
         with open("RecruiterAssistantSettings.json", "w") as f:
             dump(settings, f, indent=4)
 
         self.root.destroy()
+        exit()
+
+        self.root.protocol("WM_DELETE_WINDOW", lambda: exit())
 
     def run(self):
         self.root.mainloop()

@@ -3,7 +3,6 @@
     "email_name": "a@gmail.com",
     "boolean_settings": {
         "msg_show": true,
-        "tab_close": false,
         "Whatsapp_msg_send": false,
         "allow_pasting": false
     },
@@ -33,5 +32,6 @@
         "auth_token": "",
         "twilio_default_number": "+14155238886",
         "user_phone_number": ""
-    }
+    },
+    "total_msg_sent": 0
 }

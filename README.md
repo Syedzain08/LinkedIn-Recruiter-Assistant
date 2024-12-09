@@ -1,23 +1,3 @@
----
-icon: hand-wave
-cover: >-
-  .gitbook/assets/AlbedoBase_XL_Create_a_professional_banner_for_software_docume_1.jpg
-coverY: 0
-layout:
-  cover:
-    visible: true
-    size: full
-  title:
-    visible: true
-  description:
-    visible: false
-  tableOfContents:
-    visible: true
-  outline:
-    visible: true
-  pagination:
-    visible: true
----
 
 # Welcome
 
